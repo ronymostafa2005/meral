@@ -31,7 +31,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative z-[1] w-full bg-[#030303]/70 text-white pt-20 pb-12 px-4 sm:px-8 border-t border-red-500/20 select-none overflow-hidden">
+    <footer className="relative z-[1] w-full bg-[#030303]/70 text-white pt-20 pb-12 px-4 sm:px-8 md:pr-24 border-t border-red-500/20 select-none overflow-hidden">
       {/* Background ambient crimson glow */}
       <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-red-600/5 rounded-full blur-[160px] pointer-events-none" />
 

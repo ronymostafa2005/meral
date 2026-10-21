@@ -109,11 +109,7 @@ export const VerticalScrollTracker: React.FC = () => {
 
               {/* Flyout Label on hover or active */}
               <div
-                className={`absolute right-7 px-2.5 py-1 rounded bg-[#111111]/90 border border-white/15 backdrop-blur-md text-[10px] font-mono tracking-wider whitespace-nowrap transition-all duration-200 pointer-events-none ${
-                  isActive
-                    ? 'opacity-100 translate-x-0 text-white border-red-500/50'
-                    : 'opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-neutral-400'
-                }`}
+                className="absolute right-7 px-2.5 py-1 rounded bg-[#111111]/90 border border-white/15 backdrop-blur-md text-[10px] font-mono tracking-wider whitespace-nowrap pointer-events-none opacity-0 translate-x-2 text-neutral-400 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-white group-hover:border-red-500/50"
               >
                 <span className="text-red-400 mr-1.5">{sec.num}</span>
                 {sec.label}
