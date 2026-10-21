@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Volume2, VolumeX, Menu, X, Globe, Sparkles } from 'lucide-react';
+import { Menu, X, Globe, Sparkles } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { getFormattedStudioTime } from '../utils/logic';
 import { ScrambleText } from './ScrambleText';
@@ -12,7 +12,6 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
-  const [isMuted, setIsMuted] = useState(sound.getMuted());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localTime, setLocalTime] = useState('--:--');
   const [scrolled, setScrolled] = useState(false);
@@ -48,14 +47,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const toggleSound = () => {
-    const muted = sound.toggleMute();
-    setIsMuted(muted);
-    if (!muted) {
-      sound.playWaterDrop();
-    }
-  };
 
   const scrollTo = (id: string) => {
     sound.playWaterDrop();
@@ -173,30 +164,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                 <span>LOCAL {localTime}</span>
               </div>
             </div>
-
-            {/* Sound Toggle Button */}
-            {/* <button
-              onClick={toggleSound}
-              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-all cursor-pointer sm:px-3 ${
-                isMuted
-                  ? 'border-white/10 text-neutral-500 hover:text-neutral-300'
-                  : 'border-red-500/50 bg-red-950/20 text-red-400 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
-              }`}
-              title={isMuted ? 'Unmute Procedural Audio' : 'Mute Procedural Audio'}
-              aria-label="Sound Toggle"
-            >
-              {isMuted ? (
-                <>
-                  <VolumeX className="w-3.5 h-3.5" />
-                  <span className="text-[10px] font-mono uppercase tracking-widest hidden sm:inline">MUTED</span>
-                </>
-              ) : (
-                <>
-                  <Volume2 className="w-3.5 h-3.5 animate-pulse text-red-500" />
-                  <span className="text-[10px] font-mono uppercase tracking-widest hidden sm:inline">SOUND ON</span>
-                </>
-              )}
-            </button> */}
 
             {/* Talk to Us Button (CTA) */}
             <button
