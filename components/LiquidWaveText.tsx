@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, type ElementType } from 'react';
+import React, { createElement, useState } from 'react';
 import { motion } from 'motion/react';
 import { sound } from '../utils/audio';
 
@@ -33,15 +33,14 @@ export const LiquidWaveText: React.FC<LiquidWaveTextProps> = ({
     setIsHovered(false);
   };
 
-  const Tag: ElementType = as;
-
-  return (
-    <Tag
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={`inline-flex flex-wrap items-baseline cursor-pointer select-none group relative ${className}`}
-    >
-      {letters.map((char, index) => {
+  return createElement(
+    as,
+    {
+      onMouseEnter: handleMouseEnter,
+      onMouseLeave: handleMouseLeave,
+      className: `inline-flex flex-wrap items-baseline cursor-pointer select-none group relative ${className}`,
+    },
+    letters.map((char, index) => {
         if (char === ' ') {
           return (
             <span key={index} className="inline-block w-[0.3em]">
@@ -93,7 +92,6 @@ export const LiquidWaveText: React.FC<LiquidWaveTextProps> = ({
             )}
           </motion.span>
         );
-      })}
-    </Tag>
+    })
   );
 };
