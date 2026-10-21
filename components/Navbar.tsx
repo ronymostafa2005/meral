@@ -175,7 +175,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
             </div>
 
             {/* Sound Toggle Button */}
-            <button
+            {/* <button
               onClick={toggleSound}
               className={`flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-all cursor-pointer sm:px-3 ${
                 isMuted
@@ -196,7 +196,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                   <span className="text-[10px] font-mono uppercase tracking-widest hidden sm:inline">SOUND ON</span>
                 </>
               )}
-            </button>
+            </button> */}
 
             {/* Talk to Us Button (CTA) */}
             <button

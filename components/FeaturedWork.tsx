@@ -38,7 +38,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
   };
 
   return (
-    <section id="works" className="relative w-full py-24 sm:py-32 px-4 sm:px-8 border-b border-white/10 bg-[#050505]">
+    <section id="works" className="relative w-full py-24 sm:py-32 px-4 sm:px-8 border-b border-white/10 bg-[#050505]/55">
       {/* Background ambient crimson light */}
       <div className="absolute top-1/3 right-10 w-96 h-96 bg-red-600/5 rounded-full blur-[140px] pointer-events-none" />
 

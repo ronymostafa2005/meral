@@ -12,9 +12,9 @@ export function Hero3D() {
   return (
     <section
       id="hero"
-      className="relative flex w-full flex-col overflow-hidden bg-[#050505] px-5 pb-8 pt-24 sm:px-8 sm:pb-12 sm:pt-28 lg:min-h-[100svh] lg:px-12"
+      className="relative flex w-full flex-col overflow-hidden bg-[#050505]/55 px-5 pb-8 pt-24 sm:px-8 sm:pb-12 sm:pt-28 lg:min-h-[100svh] lg:px-12"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(196,165,116,0.1)_0%,_rgba(10,8,6,0.2)_42%,_#050505_78%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(196,165,116,0.14)_0%,_rgba(140,64,72,0.08)_46%,_transparent_78%)]" />
 
       <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 pt-2 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500 sm:flex-row sm:text-xs sm:tracking-widest">
         <span className="text-white">Graphic designer</span>
@@ -58,16 +58,16 @@ export function Hero3D() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="order-1 mx-auto flex flex-col items-center lg:order-2"
         >
-          <div className="relative h-52 w-52 sm:h-64 sm:w-64 lg:h-[22rem] lg:w-[22rem]">
-            <div className="absolute -inset-3 rounded-full border border-[#c4a574]/35" />
+          <div className="relative h-44 w-44 sm:h-56 sm:w-56 lg:h-72 lg:w-72">
+            <div className="absolute -inset-2.5 rounded-full border border-[#c4a574]/35" />
             <div className="absolute -inset-1 rounded-full border border-white/10" />
-            <div className="h-full w-full overflow-hidden rounded-full bg-[#161616] shadow-[0_24px_70px_rgba(0,0,0,0.55)]">
+            <div className="h-full w-full overflow-hidden rounded-full bg-[#161616] shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
               <img
-                src="/work/meral.png"
+                src="/work/meral.jpg"
                 alt="Portrait of Meral, graphic designer"
-                width={1176}
-                height={1104}
-                className="h-full w-full object-cover object-center"
+                width={1024}
+                height={1024}
+                className="h-full w-full origin-center scale-[1.08] object-cover object-center"
               />
             </div>
           </div>

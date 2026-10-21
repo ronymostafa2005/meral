@@ -9,7 +9,7 @@ import { ScrambleText } from './ScrambleText';
 
 export const AboutSection: React.FC = () => {
   return (
-    <section id="about" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 overflow-hidden bg-[#050505] scroll-mt-20">
+    <section id="about" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 overflow-hidden bg-[#050505]/55 scroll-mt-20">
       {/* Background ambient crimson glow */}
       <div className="absolute top-1/2 left-10 w-96 h-96 bg-red-600/5 rounded-full blur-[160px] pointer-events-none" />
 

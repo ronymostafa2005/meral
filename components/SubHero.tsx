@@ -14,7 +14,7 @@ const SERVICE_ICONS: Record<(typeof SERVICES)[number]['icon'], LucideIcon> = {
 
 export const SubHero: React.FC = () => {
   return (
-    <section className="relative w-full py-24 sm:py-32 px-4 sm:px-8 border-b border-red-950/40 overflow-hidden bg-[#050505]">
+    <section className="relative w-full py-24 sm:py-32 px-4 sm:px-8 border-b border-red-950/40 overflow-hidden bg-[#050505]/55">
       {/* Background ambient crimson glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-64 bg-red-600/5 rounded-full blur-[140px] pointer-events-none" />
 

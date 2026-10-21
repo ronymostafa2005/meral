@@ -118,7 +118,7 @@ export default function App() {
       <Navbar onOpenProjectBot={handleOpenProjectBot} />
 
       {/* Main Content Sections */}
-      <main className="relative">
+      <main className="relative z-[1]">
         {/* Hero with 3D metallic centerpiece & artwork switcher */}
         <Hero3D />
 

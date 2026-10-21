@@ -103,7 +103,7 @@ export const IdeaBot: React.FC = () => {
   const estimate = calculateProjectEstimate(formData.projectType, formData.budget);
 
   return (
-    <section id="talk" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 bg-[#050505] scroll-mt-20">
+    <section id="talk" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 bg-[#050505]/55 scroll-mt-20">
       {/* Background ambient crimson glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-80 bg-red-600/10 rounded-full blur-[150px] pointer-events-none" />
 
