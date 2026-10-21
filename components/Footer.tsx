@@ -126,17 +126,6 @@ export const Footer: React.FC = () => {
           </div>
           <div className="flex items-center gap-6">
             <span>ART DIRECTION &bull; CAMPAIGN &bull; PRINT</span>
-            <a
-              href="#cookie-pref"
-              onClick={(e) => {
-                e.preventDefault();
-                const btn = document.getElementById('cookie-banner-trigger');
-                if (btn) btn.click();
-              }}
-              className="hover:text-red-400 transition-colors"
-            >
-              PRIVACY PREFERENCES
-            </a>
           </div>
         </div>
       </div>

@@ -11,7 +11,6 @@ import { AboutSection } from './AboutSection';
 import { AwardsSection } from './AwardsSection';
 import { IdeaBot } from './IdeaBot';
 import { Footer } from './Footer';
-import { CookieConsent } from './CookieConsent';
 import { WaterRippleCanvas } from './WaterRippleCanvas';
 import { VerticalScrollTracker } from './VerticalScrollTracker';
 import { Project } from '../types/portfolio';
@@ -148,8 +147,6 @@ export default function App() {
         onSelectProject={(project) => setSelectedProject(project)}
       />
 
-      {/* Cookie Consent Banner */}
-      <CookieConsent />
     </div>
   );
 }
