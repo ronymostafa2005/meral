@@ -225,11 +225,27 @@ export const AWARDS: AwardItem[] = [
   }
 ];
 
-export const STUDIO_STATS = [
-  { value: '06', label: 'CAMPAIGNS IN THIS SELECTION' },
-  { value: '02', label: 'BRANDS: LUX REALTY & RISE TOWER' },
-  { value: '01', label: 'DESIGNER. MERAL.' },
-  { value: '04', label: 'DISCIPLINES, FROM ART DIRECTION TO PRINT' }
+export const SERVICES = [
+  {
+    title: 'Art Direction',
+    detail: 'The frame, the crop, and what stays out of the picture.',
+    icon: 'direction' as const
+  },
+  {
+    title: 'Campaign Design',
+    detail: 'Key visuals and launch campaigns for developments.',
+    icon: 'campaigns' as const
+  },
+  {
+    title: 'Brand Voice',
+    detail: 'Lines written to be read once, on a poster or in print.',
+    icon: 'voice' as const
+  },
+  {
+    title: 'Print & Editorial',
+    detail: 'Layouts and stills for paper as well as the screen.',
+    icon: 'print' as const
+  }
 ];
 
 export const CLIENT_LOGOS = [

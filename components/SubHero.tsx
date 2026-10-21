@@ -2,9 +2,15 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { STUDIO_STATS } from '../data/portfolioData';
-import { LiquidWaveText } from './LiquidWaveText';
-import { Droplets, Sparkles } from 'lucide-react';
+import { SERVICES } from '../data/portfolioData';
+import { Aperture, Images, Quote, BookOpen, type LucideIcon } from 'lucide-react';
+
+const SERVICE_ICONS: Record<(typeof SERVICES)[number]['icon'], LucideIcon> = {
+  direction: Aperture,
+  campaigns: Images,
+  voice: Quote,
+  print: BookOpen
+};
 
 export const SubHero: React.FC = () => {
   return (
@@ -39,28 +45,32 @@ export const SubHero: React.FC = () => {
           </p>
         </div>
 
-        {/* Studio Stats Grid with Crimson & Obsidian Finish */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-white/10">
-          {STUDIO_STATS.map((stat, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              className="group p-5 rounded-2xl bg-gradient-to-b from-white/[0.04] to-transparent border border-white/10 hover:border-red-500/40 hover:bg-red-950/10 transition-all duration-300"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-white group-hover:text-red-500 transition-colors">
-                  {stat.value}
-                </span>
-                <Droplets className="w-4 h-4 text-neutral-600 group-hover:text-red-500 group-hover:scale-125 transition-all" />
-              </div>
-              <p className="font-mono text-[11px] sm:text-xs text-neutral-400 tracking-wider uppercase mt-1 leading-snug">
-                {stat.label}
-              </p>
-            </motion.div>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 pt-10 border-t border-white/10">
+          {SERVICES.map((service, idx) => {
+            const Icon = SERVICE_ICONS[service.icon];
+            return (
+              <motion.div
+                key={service.icon}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                className="group flex h-full items-start gap-4 rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 sm:p-5 transition-all duration-300 hover:border-[#c4a574]/40 hover:bg-[#c4a574]/[0.04]"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#c4a574] transition-colors group-hover:border-[#c4a574]/40">
+                  <Icon className="h-5 w-5" strokeWidth={1.6} />
+                </div>
+                <div className="min-w-0 pt-0.5">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-neutral-100">
+                    {service.title}
+                  </p>
+                  <p className="mt-2 text-sm leading-snug text-neutral-500">
+                    {service.detail}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
