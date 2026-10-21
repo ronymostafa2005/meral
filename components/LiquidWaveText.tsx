@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, type ElementType } from 'react';
 import { motion } from 'motion/react';
 import { sound } from '../utils/audio';
 
@@ -33,7 +33,7 @@ export const LiquidWaveText: React.FC<LiquidWaveTextProps> = ({
     setIsHovered(false);
   };
 
-  const Tag = as as keyof JSX.IntrinsicElements;
+  const Tag: ElementType = as;
 
   return (
     <Tag
