@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowUpRight, LayoutGrid, List, Search } from 'lucide-react';
+import { ArrowUpRight, BookOpen, LayoutGrid, List, Search } from 'lucide-react';
 import { Project } from '../types/portfolio';
 import { filterProjects } from '../utils/logic';
 import { sound } from '../utils/audio';
 import { LiquidWaveText } from './LiquidWaveText';
 import { ScrambleText } from './ScrambleText';
+import { BookFolio } from './BookFolio';
 import { Brand3DCard } from './Brand3DCard';
 import { useSite } from './SiteProvider';
 
@@ -35,7 +36,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
   const works = content.works;
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'book' | 'grid' | 'list'>('book');
 
   const categories = ['All', ...Array.from(new Set(works.projects.map((project) => project.category).filter(Boolean)))];
   const filteredProjects = filterProjects(works.projects, selectedCategory, searchQuery);
@@ -119,8 +120,21 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
               )}
             </div>
 
-            {/* View Mode Grid/List */}
+            {/* View Mode Book/Grid/List */}
             <div className="flex items-center p-1 rounded-full bg-[#111111] border border-white/10">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setViewMode('book');
+                }}
+                className={`p-1.5 rounded-full transition-colors cursor-pointer flex items-center gap-1.5 px-2.5 ${
+                  viewMode === 'book' ? 'bg-white text-black font-bold' : 'text-neutral-400 hover:text-white'
+                }`}
+                title="3D Book Unfolding"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline text-[10px] font-mono uppercase">Book</span>
+              </button>
               <button
                 onClick={() => {
                   sound.playClick();
@@ -129,7 +143,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
                 className={`p-1.5 rounded-full transition-colors cursor-pointer ${
                   viewMode === 'grid' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'
                 }`}
-                title="3D Brand Cards"
+                title="3D Brand Orbit"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
@@ -149,14 +163,20 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
           </div>
         </div>
 
-        {/* Projects Display: 3D Brand Cards Grid or List */}
+        {/* Projects Display: 3D Book Folio, 3D Brand Orbit, or List */}
         {filteredProjects.length === 0 ? (
           <div className="py-16 text-center font-mono text-neutral-500 text-sm">
             No projects found matching &ldquo;{searchQuery}&rdquo;. Try another search or filter.
           </div>
+        ) : viewMode === 'book' ? (
+          /* 3D BOOK ACCORDION UNFOLDING (Requested View matching screenshot) */
+          <BookFolio
+            projects={filteredProjects}
+            onOpenProject={handleOpenProject}
+          />
         ) : viewMode === 'grid' ? (
           /* 3D Brand Cards Grid with Central Logo and Orbiting Artwork */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
             <AnimatePresence>
               {clientGroups.map((group, idx) => (
                 <Brand3DCard
