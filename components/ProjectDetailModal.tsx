@@ -5,8 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, ExternalLink, ArrowRight, Award, CheckCircle2, Droplets } from 'lucide-react';
 import { Project } from '../types/portfolio';
 import { sound } from '../utils/audio';
-import { PROJECTS } from '../data/portfolioData';
-import { ScrambleText } from './ScrambleText';
+import { useSite } from './SiteProvider';
 
 interface ProjectDetailModalProps {
   project: Project | null;
@@ -19,6 +18,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
   onClose,
   onSelectProject,
 }) => {
+  const { content } = useSite();
+  const projects = content.works.projects;
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -38,8 +39,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
   if (!project) return null;
 
-  const currentIndex = PROJECTS.findIndex((p) => p.id === project.id);
-  const nextProject = PROJECTS[(currentIndex + 1) % PROJECTS.length];
+  const currentIndex = Math.max(0, projects.findIndex((p) => p.id === project.id));
+  const nextProject = projects[(currentIndex + 1) % Math.max(projects.length, 1)];
 
   return (
     <AnimatePresence>
@@ -208,7 +209,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </div>
             )}
 
-            {/* Next Project Footer Switcher */}
+            {nextProject && (
             <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <span className="text-xs font-mono text-neutral-400">NEXT CASE STUDY</span>
               <button
@@ -222,6 +223,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <ArrowRight className="w-5 h-5 text-red-500 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </div>
+            )}
           </div>
         </motion.div>
       </div>

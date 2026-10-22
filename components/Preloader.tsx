@@ -3,23 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sound } from '../utils/audio';
-import { ArrowRight, Droplets, Sparkles } from 'lucide-react';
+import { ArrowRight, Droplets } from 'lucide-react';
 import { LiquidWaveText } from './LiquidWaveText';
+import { useSite } from './SiteProvider';
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
-const PRELOADER_IMAGES = [
-  '/work/rise-1.jpg',
-  '/work/pyramids.jpg',
-  '/work/taj-tower.jpg',
-  '/work/village.jpg',
-  '/work/silver-sands.jpg',
-  '/work/unseen.jpg'
-];
-
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
+  const { content } = useSite();
+  const intro = content.intro;
+  const images = intro.images.filter(Boolean);
+  const frames = images.length ? images : ['/work/rise-1.jpg'];
   const [imageIndex, setImageIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -35,9 +31,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     }
 
     const imgInterval = setInterval(() => {
-      setImageIndex((prev) => (prev + 1) % PRELOADER_IMAGES.length);
-      sound.playWaterDrop();
-    }, 450);
+      setImageIndex((prev) => (prev + 1) % frames.length);
+    }, 220);
 
     const progInterval = setInterval(() => {
       setProgress((prev) => {
@@ -45,21 +40,21 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           clearInterval(progInterval);
           return 100;
         }
-        return prev + 2;
+        return prev + 12;
       });
-    }, 40);
+    }, 32);
 
     return () => {
       clearInterval(imgInterval);
       clearInterval(progInterval);
     };
-  }, []);
+  }, [frames.length, onComplete]);
 
   useEffect(() => {
     if (progress >= 100) {
       const timer = setTimeout(() => {
         handleFinish();
-      }, 400);
+      }, 160);
       return () => clearTimeout(timer);
     }
   }, [progress]);
@@ -70,7 +65,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     sound.playSuccess();
     setTimeout(() => {
       onComplete();
-    }, 600);
+    }, 280);
   };
 
   return (
@@ -78,8 +73,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       {!isExiting && (
         <motion.div
           initial={{ opacity: 1 }}
-          exit={{ opacity: 0, y: -60, filter: 'blur(16px)' }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
           onClick={handleFinish}
           className="fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-12 bg-[#050505] text-[#ededed] cursor-pointer select-none overflow-hidden"
           role="dialog"
@@ -93,8 +88,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           <div className="flex justify-between items-center text-xs tracking-widest text-neutral-400 uppercase font-mono relative z-10">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="font-semibold text-white">MERAL</span>
-              <span className="text-neutral-600 hidden sm:inline">GRAPHIC DESIGN</span>
+              <span className="font-semibold text-white">{intro.brand}</span>
+              <span className="text-neutral-600 hidden sm:inline">{intro.discipline}</span>
             </div>
             <button
               onClick={(e) => {
@@ -103,7 +98,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
               }}
               className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/20 hover:border-red-500 hover:bg-red-500/10 text-neutral-300 hover:text-white transition-all text-xs"
             >
-              <span>ENTER</span>
+              <span>{intro.enter}</span>
               <ArrowRight className="w-3 h-3 text-red-500" />
             </button>
           </div>
@@ -118,10 +113,10 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
               className="text-center md:text-left"
             >
               <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-extrabold tracking-tighter uppercase leading-none">
-                <LiquidWaveText text="BRAND" className="text-white hover:text-red-500" />
+                <LiquidWaveText text={intro.leftA} className="text-white hover:text-red-500" />
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-white to-neutral-400">
-                  <LiquidWaveText text="CRAFT" />
+                  <LiquidWaveText text={intro.leftB} />
                 </span>
               </h1>
             </motion.div>
@@ -145,7 +140,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={imageIndex}
-                    src={PRELOADER_IMAGES[imageIndex]}
+                    src={frames[imageIndex % frames.length]}
                     alt="Selected campaign by Meral"
                     initial={{ opacity: 0, scale: 1.15, filter: 'blur(4px)' }}
                     animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
@@ -160,7 +155,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
                 {/* Subtle red badge inside */}
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-[9px] font-mono text-white tracking-widest uppercase">
-                  KV.2026
+                  {intro.badge}
                 </div>
               </motion.div>
             </div>
@@ -174,10 +169,10 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             >
               <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-extrabold tracking-tighter uppercase leading-none">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-400 via-white to-red-500">
-                  <LiquidWaveText text="WHY" />
+                  <LiquidWaveText text={intro.rightA} />
                 </span>
                 <br />
-                <LiquidWaveText text="THERE" className="text-white hover:text-red-500" />
+                <LiquidWaveText text={intro.rightB} className="text-white hover:text-red-500" />
               </h2>
             </motion.div>
           </div>
@@ -187,7 +182,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             <div className="flex items-center gap-2">
               <Droplets className="w-3.5 h-3.5 text-red-500 animate-bounce" />
               <span className="text-neutral-300">
-                Graphic design for real estate campaigns. Selected work only.
+                {intro.note}
               </span>
             </div>
 

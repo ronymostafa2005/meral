@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans, Syne } from "next/font/google";
+import { SiteProvider } from "@/components/SiteProvider";
 import "./globals.css";
 
 const syne = Syne({
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${syne.variable} ${jakarta.variable} ${jetbrains.variable} dark h-full scroll-smooth antialiased`}
     >
       <body className="min-h-full overflow-x-hidden bg-[#050505] text-[#ededed]">
-        {children}
+        <SiteProvider>{children}</SiteProvider>
       </body>
     </html>
   );

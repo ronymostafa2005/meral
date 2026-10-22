@@ -8,6 +8,7 @@ import { calculateProjectEstimate, validateStep } from '../utils/logic';
 import { sound } from '../utils/audio';
 import { LiquidWaveText } from './LiquidWaveText';
 import { ScrambleText } from './ScrambleText';
+import { useSite } from './SiteProvider';
 
 const PROJECT_TYPES = [
   'Campaign Key Visual',
@@ -27,6 +28,8 @@ const BUDGET_RANGES = [
 ];
 
 export const IdeaBot: React.FC = () => {
+  const { content } = useSite();
+  const talk = content.talk;
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [formData, setFormData] = useState<BotFormData>({
     name: '',
@@ -112,16 +115,16 @@ export const IdeaBot: React.FC = () => {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-950/20 text-xs font-mono uppercase text-red-400 mb-4 shadow-[0_0_15px_rgba(239,68,68,0.3)]">
             <Sparkles className="w-3.5 h-3.5 text-red-500" />
-            <span>05 &bull; PROJECT INQUIRY &bull; MERAL</span>
+            <span>{talk.kicker}</span>
           </div>
           <h2 className="font-display text-4xl sm:text-6xl font-extrabold text-white tracking-tight uppercase">
-            <LiquidWaveText text="LET’S TALK" className="hover:text-red-500" />{' '}
+            <LiquidWaveText text={talk.titleA} className="hover:text-red-500" />{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-white to-red-400">
-              <LiquidWaveText text="IDEAS" />
+              <LiquidWaveText text={talk.titleB} />
             </span>
           </h2>
           <p className="text-neutral-400 font-mono text-xs sm:text-sm mt-3">
-            A short brief is enough. Meral reviews campaign, brand, and print inquiries directly.
+            {talk.intro}
           </p>
         </div>
 
@@ -133,12 +136,12 @@ export const IdeaBot: React.FC = () => {
               <span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" />
               <span className="w-3 h-3 rounded-full bg-neutral-600" />
               <span className="w-3 h-3 rounded-full bg-neutral-600" />
-              <span className="ml-3 text-xs font-mono text-neutral-400">meral-inquiry</span>
+              <span className="ml-3 text-xs font-mono text-neutral-400">{talk.windowLabel}</span>
             </div>
 
             <div className="flex items-center gap-2 text-xs font-mono text-neutral-400">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-              <span className="text-red-400 font-semibold">LIVE STUDIO DISPATCH</span>
+              <span className="text-red-400 font-semibold">{talk.status}</span>
             </div>
           </div>
 
@@ -196,7 +199,7 @@ export const IdeaBot: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <p className="text-sm sm:text-base text-neutral-200 leading-relaxed">
-                      Hello. This is Meral’s inquiry desk. Share the project, the timeline, and what the campaign needs to say. You’ll get a plain scope note back on this page.
+                      {talk.greeting}
                     </p>
                     {currentStep === 0 && (
                       <div className="pt-2">

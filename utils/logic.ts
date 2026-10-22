@@ -1,8 +1,8 @@
-import { BotFormData, FormValidationResult, Project, ProjectCategory } from '../types/portfolio';
+import { BotFormData, FormValidationResult, Project } from '../types/portfolio';
 
 export function filterProjects(
   projects: Project[],
-  category: ProjectCategory,
+  category: string,
   searchQuery: string = ''
 ): Project[] {
   let filtered = projects;

@@ -11,16 +11,14 @@ import { AboutSection } from './AboutSection';
 import { AwardsSection } from './AwardsSection';
 import { IdeaBot } from './IdeaBot';
 import { Footer } from './Footer';
-import { WaterRippleCanvas } from './WaterRippleCanvas';
 import { VerticalScrollTracker } from './VerticalScrollTracker';
 import { Project } from '../types/portfolio';
+import { useSite } from './SiteProvider';
 
 export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
-  const [cursorHovered, setCursorHovered] = useState(false);
-  const [waterActive, setWaterActive] = useState(true);
+  const { content, owner } = useSite();
 
   useEffect(() => {
     // Check if ?autostart=1 is present
@@ -31,33 +29,6 @@ export default function App() {
       }
     }
 
-    // Cursor position follower for ambient agency feel
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPos({ x: e.clientX, y: e.clientY });
-    };
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'BUTTON' ||
-        target.tagName === 'A' ||
-        target.closest('button') ||
-        target.closest('a') ||
-        target.getAttribute('role') === 'button'
-      ) {
-        setCursorHovered(true);
-      } else {
-        setCursorHovered(false);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseover', handleMouseOver);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseover', handleMouseOver);
-    };
   }, []);
 
   const handleOpenProjectBot = () => {
@@ -68,47 +39,12 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-[#ededed] font-sans overflow-x-hidden selection:bg-red-600 selection:text-white">
-      {/* SVG Liquid Distortion Filter Definition */}
-      <svg className="hidden" aria-hidden="true">
-        <filter id="liquid-distortion">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.015 0.03"
-            numOctaves="3"
-            result="noise"
-          />
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            scale="8"
-            xChannelSelector="R"
-            yChannelSelector="G"
-          />
-        </filter>
-      </svg>
-
-      {/* Interactive Water Ripple Simulation Canvas */}
-      {waterActive && <WaterRippleCanvas interactive={true} />}
-
+    <div
+      className="relative min-h-screen overflow-x-hidden font-sans selection:bg-[#c4a574] selection:text-black"
+      style={{ backgroundColor: content.brand.background, color: content.brand.text }}
+    >
       {/* Vertical Scroll Progress Tracker (Pinned on right) */}
       <VerticalScrollTracker />
-
-      {/* Liquid Red & White Custom Cursor (hidden on touch) */}
-      <div
-        className={`hidden md:block fixed pointer-events-none z-50 rounded-full transition-transform duration-100 ease-out border ${
-          cursorHovered
-            ? 'w-12 h-12 -ml-6 -mt-6 border-red-500 bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.7)] scale-125'
-            : 'w-4 h-4 -ml-2 -mt-2 border-white/60 bg-red-600/40 shadow-[0_0_10px_rgba(239,68,68,0.5)]'
-        }`}
-        style={{
-          transform: `translate3d(${cursorPos.x}px, ${cursorPos.y}px, 0)`,
-        }}
-      >
-        {cursorHovered && (
-          <div className="absolute inset-0 rounded-full border border-white/40 animate-ping opacity-60" />
-        )}
-      </div>
 
       {/* Preloader Intro */}
       {loading && <Preloader onComplete={() => setLoading(false)} />}
@@ -118,7 +54,7 @@ export default function App() {
 
       {/* Main Content Sections */}
       <main className="relative z-[1]">
-        {/* Hero with 3D metallic centerpiece & artwork switcher */}
+        {/* Hero with portrait and program fan */}
         <Hero3D />
 
         {/* SubHero with Manifesto & Studio Metrics */}
@@ -139,6 +75,15 @@ export default function App() {
 
       {/* Footer */}
       <Footer />
+
+      {owner && (
+        <a
+          href="/dashboard"
+          className="fixed bottom-5 left-5 z-40 rounded-full border border-white/20 bg-black/80 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-white shadow-lg backdrop-blur"
+        >
+          Edit portfolio
+        </a>
+      )}
 
       {/* Case Study Detail Modal */}
       <ProjectDetailModal

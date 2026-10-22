@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { AWARDS } from '../data/portfolioData';
-import { Trophy, Award, Sparkles } from 'lucide-react';
-import { LiquidWaveText } from './LiquidWaveText';
+import { Trophy, Award } from 'lucide-react';
 import { ScrambleText } from './ScrambleText';
+import { useSite } from './SiteProvider';
 
 export const AwardsSection: React.FC = () => {
+  const { content } = useSite();
+  const awards = content.awards;
+
   return (
     <section id="awards" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 bg-[#050505]/55 scroll-mt-20">
       {/* Background ambient crimson glow */}
@@ -19,21 +21,21 @@ export const AwardsSection: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-red-500 uppercase mb-3">
               <Trophy className="w-4 h-4 text-red-500" />
-              <span>04 &bull; WHAT IS ON VIEW</span>
+              <span>{awards.kicker}</span>
             </div>
             <h2 className="font-display text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-2xl leading-[1.1]">
-              Six campaigns. Two brands. Nothing else on this page.
+              {awards.headline}
             </h2>
           </div>
 
           <p className="text-neutral-400 text-sm sm:text-base max-w-md font-light leading-relaxed">
-            The selection is limited to work Meral designed for Lux Realty and Rise Tower Developments.
+            {awards.intro}
           </p>
         </div>
 
         {/* Awards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-12">
-          {AWARDS.map((award, idx) => (
+          {awards.items.map((award, idx) => (
             <motion.div
               key={award.id || idx}
               initial={{ opacity: 0, y: 20 }}

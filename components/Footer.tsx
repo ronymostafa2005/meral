@@ -6,15 +6,12 @@ import { sound } from '../utils/audio';
 import { LiquidWaveText } from './LiquidWaveText';
 import { ScrambleText } from './ScrambleText';
 import { MeralLogo } from './MeralLogo';
-
-const LINKS = [
-  { name: 'Selected work', url: '#works' },
-  { name: 'Practice', url: '#about' },
-  { name: 'Start a project', url: '#talk' },
-];
+import { useSite } from './SiteProvider';
 
 export const Footer: React.FC = () => {
   const [year, setYear] = useState(2026);
+  const { content } = useSite();
+  const footer = content.footer;
 
   useEffect(() => {
     setYear(new Date().getFullYear());
@@ -40,12 +37,12 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-16 border-b border-white/10">
           <div>
             <span className="text-xs font-mono uppercase tracking-widest text-red-500 block mb-3 font-semibold">
-              // MERAL
+              {footer.kicker}
             </span>
             <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white uppercase leading-[1.05]">
-              <LiquidWaveText text="THE WORK" className="hover:text-red-500" />
+              <LiquidWaveText text={footer.lineA} className="hover:text-red-500" />
               <br />
-              <span className="text-neutral-500 font-light">SPEAKS FIRST</span>
+              <span className="text-neutral-500 font-light">{footer.lineB}</span>
             </h2>
           </div>
 
@@ -55,7 +52,7 @@ export const Footer: React.FC = () => {
               onMouseEnter={() => sound.playHover()}
               className="group flex items-center gap-3 px-6 py-3.5 rounded-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-mono text-xs uppercase tracking-wider font-bold transition-all cursor-pointer shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95"
             >
-              <span>Start a project</span>
+              <span>{footer.cta}</span>
             </button>
 
             <button
@@ -74,12 +71,12 @@ export const Footer: React.FC = () => {
           {/* Studios */}
           <div>
             <span className="text-red-400 uppercase tracking-widest block mb-4 font-semibold">
-              // PRACTICE
+              {footer.practiceLabel}
             </span>
             <div className="space-y-4 text-neutral-300">
               <MeralLogo />
               <p className="text-neutral-400 leading-relaxed font-light">
-                Independent graphic design. Campaigns, art direction, and print for real estate brands.
+                {footer.practiceBody}
               </p>
             </div>
           </div>
@@ -87,10 +84,10 @@ export const Footer: React.FC = () => {
           {/* Socials */}
           <div>
             <span className="text-red-400 uppercase tracking-widest block mb-4 font-semibold">
-              // ON THIS PAGE
+              {footer.linksLabel}
             </span>
             <ul className="space-y-2.5">
-              {LINKS.map((s) => (
+              {footer.links.map((s) => (
                 <li key={s.name}>
                   <a
                     href={s.url}
@@ -107,14 +104,14 @@ export const Footer: React.FC = () => {
           {/* Status & Legal */}
           <div>
             <span className="text-red-400 uppercase tracking-widest block mb-4 font-semibold">
-              // ETHOS &bull; BOOKINGS
+              {footer.ethosLabel}
             </span>
             <p className="text-neutral-400 leading-relaxed font-light mb-4">
-              Graphic design for developments and the brands behind them. This portfolio shows Meral’s selected campaigns only.
+              {footer.ethosBody}
             </p>
             <div className="p-3.5 bg-neutral-900 border border-red-500/30 rounded-xl text-neutral-300 text-[11px] flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping shrink-0" />
-              <span>Open for campaign and brand commissions</span>
+              <span>{footer.status}</span>
             </div>
           </div>
         </div>
@@ -122,10 +119,10 @@ export const Footer: React.FC = () => {
         {/* Bottom Credits */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-neutral-500 gap-4">
           <div>
-            &copy; {year} MERAL. ALL RIGHTS RESERVED.
+            &copy; {year} {content.brand.logoWord || 'MERAL'}. ALL RIGHTS RESERVED.
           </div>
           <div className="flex items-center gap-6">
-            <span>ART DIRECTION &bull; CAMPAIGN &bull; PRINT</span>
+            <span>{footer.credit}</span>
           </div>
         </div>
       </div>

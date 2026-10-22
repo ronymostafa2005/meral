@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Menu, X, Globe, Sparkles } from 'lucide-react';
+import { Menu, X, Globe } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { getFormattedStudioTime } from '../utils/logic';
 import { ScrambleText } from './ScrambleText';
 import { MeralLogo } from './MeralLogo';
+import { useSite } from './SiteProvider';
 
 interface NavbarProps {
   onOpenProjectBot: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
+  const { content } = useSite();
+  const nav = content.nav;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [localTime, setLocalTime] = useState('--:--');
   const [scrolled, setScrolled] = useState(false);
@@ -62,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#050505]/90 backdrop-blur-md border-b border-red-500/20 py-3 shadow-[0_4px_30px_rgba(0,0,0,0.8)]'
+            ? 'bg-[#050505]/85 backdrop-blur-md border-b border-white/10 py-3'
             : 'bg-transparent py-5'
         }`}
       >
@@ -97,7 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                     : 'bg-transparent border-neutral-600'
                 }`}
               />
-              <ScrambleText text="WORKS" />
+              <ScrambleText text={nav.works} />
             </button>
 
             <button
@@ -114,7 +117,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                     : 'bg-transparent border-neutral-600'
                 }`}
               />
-              <ScrambleText text="ABOUT" />
+              <ScrambleText text={nav.about} />
             </button>
 
             <button
@@ -131,7 +134,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                     : 'bg-transparent border-neutral-600'
                 }`}
               />
-              <ScrambleText text="AWARDS" />
+              <ScrambleText text={nav.awards} />
             </button>
 
             <button
@@ -151,7 +154,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                     : 'bg-transparent border-neutral-600'
                 }`}
               />
-              <ScrambleText text="START A PROJECT" />
+              <ScrambleText text={nav.talk} />
             </button>
           </nav>
 
@@ -171,10 +174,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
                 sound.playWaterDrop();
                 onOpenProjectBot();
               }}
-              className="hidden sm:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-mono tracking-wider font-semibold shadow-[0_0_18px_rgba(239,68,68,0.5)] transition-all cursor-pointer"
+              className="hidden sm:flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black text-xs font-mono tracking-wider font-semibold transition-colors hover:bg-[#c4a574] cursor-pointer"
             >
-              <Sparkles className="w-3 h-3" />
-              <span>LET'S TALK</span>
+              <span>{nav.cta}</span>
             </button>
 
             {/* Mobile Menu Button */}
@@ -200,21 +202,21 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
               onClick={() => scrollTo('works')}
               className="text-left text-white hover:text-red-500 transition-colors flex items-center justify-between"
             >
-              <span>Featured Works</span>
+              <span>{nav.mobileWorks}</span>
               <span className="text-xs font-mono text-red-500">01</span>
             </button>
             <button
               onClick={() => scrollTo('about')}
               className="text-left text-white hover:text-red-500 transition-colors flex items-center justify-between"
             >
-              <span>About</span>
+              <span>{nav.mobileAbout}</span>
               <span className="text-xs font-mono text-red-500">02</span>
             </button>
             <button
               onClick={() => scrollTo('awards')}
               className="text-left text-white hover:text-red-500 transition-colors flex items-center justify-between"
             >
-              <span>The selection</span>
+              <span>{nav.mobileAwards}</span>
               <span className="text-xs font-mono text-red-500">03</span>
             </button>
             <button
@@ -224,7 +226,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
               }}
               className="text-left text-red-500 font-bold flex items-center justify-between"
             >
-              <span>Start A Project</span>
+              <span>{nav.mobileTalk}</span>
               <span className="text-xs font-mono text-white">04</span>
             </button>
           </nav>
@@ -233,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
             <div className="flex justify-between">
               <span>LOCAL {localTime}</span>
             </div>
-            <p className="text-neutral-500 mt-2">MERAL &bull; GRAPHIC DESIGN</p>
+            <p className="text-neutral-500 mt-2">{content.brand.logoWord} &bull; GRAPHIC DESIGN</p>
           </div>
         </div>
       )}

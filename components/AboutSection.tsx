@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { CAPABILITIES, CLIENT_LOGOS } from '../data/portfolioData';
-import { Check, Sparkles, Droplets } from 'lucide-react';
-import { LiquidWaveText } from './LiquidWaveText';
+import { Droplets } from 'lucide-react';
 import { ScrambleText } from './ScrambleText';
+import { useSite } from './SiteProvider';
 
 export const AboutSection: React.FC = () => {
+  const { content } = useSite();
+  const about = content.about;
+
   return (
     <section id="about" className="relative w-full py-28 px-4 sm:px-8 border-b border-white/10 overflow-hidden bg-[#050505]/55 scroll-mt-20">
       {/* Background ambient crimson glow */}
@@ -18,7 +20,7 @@ export const AboutSection: React.FC = () => {
         <div className="space-y-8">
           <div className="flex items-center gap-2 text-xs font-mono tracking-widest text-red-500 uppercase">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            <span>03 &bull; MERAL &bull; GRAPHIC DESIGN</span>
+            <span>{about.kicker}</span>
           </div>
 
           <motion.h2
@@ -28,16 +30,12 @@ export const AboutSection: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="font-display text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.12] max-w-5xl"
           >
-            Campaigns are built to be read once. The place comes first, the offer second, and nothing extra stays in the frame.
+            {about.headline}
           </motion.h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-6 text-neutral-300 font-light text-base sm:text-lg leading-relaxed">
-            <p>
-              Meral is a graphic designer working on real estate campaigns. The work here is hers: art direction, key visuals, brand lines, and print for Lux Realty and Rise Tower Developments.
-            </p>
-            <p>
-              Each project is a small system. A name, a sentence, a photograph, and a mark. The same discipline runs from a night tower visual to a printed sheet.
-            </p>
+            <p>{about.paragraphA}</p>
+            <p>{about.paragraphB}</p>
           </div>
         </div>
 
@@ -45,13 +43,13 @@ export const AboutSection: React.FC = () => {
         <div className="pt-12 border-t border-white/10">
           <div className="flex items-center justify-between mb-12">
             <h3 className="text-xs font-mono tracking-widest uppercase text-red-400">
-              // PRACTICE
+              {about.practiceLabel}
             </h3>
-            <span className="text-xs font-mono text-neutral-400">ART DIRECTION TO PRINT</span>
+            <span className="text-xs font-mono text-neutral-400">{about.practiceNote}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {CAPABILITIES.map((cap) => (
+            {about.capabilities.map((cap) => (
               <motion.div
                 key={cap.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -90,17 +88,17 @@ export const AboutSection: React.FC = () => {
         <div className="pt-12 border-t border-white/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <h3 className="text-xs font-mono tracking-widest uppercase text-neutral-400">
-              // CLIENTS IN THIS SELECTION
+              {about.clientsLabel}
             </h3>
             <span className="text-xs font-mono text-red-400">
-              SELECTED BRANDS
+              {about.clientsNote}
             </span>
           </div>
 
           {/* Marquee Row */}
           <div className="overflow-hidden py-5 border-y border-white/10 relative bg-black/40">
             <div className="animate-marquee flex items-center gap-12 sm:gap-16 whitespace-nowrap">
-              {CLIENT_LOGOS.concat(CLIENT_LOGOS).map((client, idx) => (
+              {about.clients.concat(about.clients).map((client, idx) => (
                 <div key={idx} className="flex items-center gap-12 sm:gap-16">
                   <span className="font-display text-xl sm:text-2xl font-bold text-neutral-400 hover:text-white hover:scale-105 transition-all cursor-default">
                     {client}

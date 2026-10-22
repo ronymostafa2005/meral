@@ -28,6 +28,7 @@ export interface Project {
   accentColor: string;
   liveUrl?: string;
   role: string[];
+  clientLogo?: string;
 }
 
 export interface AwardItem {
