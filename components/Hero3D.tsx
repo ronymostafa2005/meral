@@ -14,16 +14,16 @@ export function Hero3D() {
   return (
     <section
       id="hero"
-      className="relative flex w-full flex-col overflow-hidden bg-[#050505]/55 px-5 pb-4 pt-20 sm:px-8 sm:pb-8 sm:pt-24 lg:min-h-[92svh] lg:px-12"
+      className="relative flex w-full flex-col overflow-hidden bg-[#050505]/55 px-5 pb-3 pt-16 sm:px-8 sm:pb-5 sm:pt-20 lg:min-h-[88svh] lg:px-12"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(196,165,116,0.14)_0%,_rgba(140,64,72,0.08)_46%,_transparent_78%)]" />
 
-      <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 pt-1 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500 sm:flex-row sm:text-xs sm:tracking-widest">
+      <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col items-center justify-between gap-2 pt-1 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500 sm:flex-row sm:text-xs sm:tracking-widest">
         <span className="text-white">{hero.leftLabel}</span>
         <span>{hero.rightLabel}</span>
       </div>
 
-      <div className="relative z-20 mx-auto grid w-full max-w-6xl items-center gap-6 py-4 sm:gap-8 sm:py-6 lg:grid-cols-[1.15fr_0.85fr] lg:py-6">
+      <div className="relative z-20 mx-auto grid w-full max-w-6xl items-center gap-5 py-3 sm:gap-6 sm:py-4 lg:grid-cols-[1.15fr_0.85fr] lg:py-4">
         <div className="order-2 flex flex-col items-center text-center lg:order-1 lg:items-start lg:text-left">
           <p className="text-brand font-mono text-[11px] uppercase tracking-[0.32em]">
             {hero.eyebrow}
