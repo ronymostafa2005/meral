@@ -8,11 +8,26 @@ import { filterProjects } from '../utils/logic';
 import { sound } from '../utils/audio';
 import { LiquidWaveText } from './LiquidWaveText';
 import { ScrambleText } from './ScrambleText';
-import { SocialWorkCard } from './SocialWorkCard';
+import { Brand3DCard } from './Brand3DCard';
 import { useSite } from './SiteProvider';
 
 interface FeaturedWorkProps {
   onSelectProject: (project: Project) => void;
+}
+
+function groupByClient(projects: Project[]) {
+  const order: string[] = [];
+  const groups = new Map<string, Project[]>();
+  for (const project of projects) {
+    const existing = groups.get(project.client);
+    if (existing) {
+      existing.push(project);
+    } else {
+      groups.set(project.client, [project]);
+      order.push(project.client);
+    }
+  }
+  return order.map((client) => ({ client, projects: groups.get(client) ?? [] }));
 }
 
 export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) => {
@@ -24,6 +39,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
 
   const categories = ['All', ...Array.from(new Set(works.projects.map((project) => project.category).filter(Boolean)))];
   const filteredProjects = filterProjects(works.projects, selectedCategory, searchQuery);
+  const clientGroups = groupByClient(filteredProjects);
 
   const handleCategoryChange = (cat: string) => {
     sound.playWaterDrop();
@@ -50,7 +66,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-display font-extrabold uppercase tracking-tight text-white leading-none">
               <LiquidWaveText text={works.titleA} className="hover:text-red-500" />{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-white to-neutral-400">
+              <span className="text-white hover:text-red-400 transition-colors">
                 <LiquidWaveText text={works.titleB} />
               </span>
             </h2>
@@ -113,7 +129,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
                 className={`p-1.5 rounded-full transition-colors cursor-pointer ${
                   viewMode === 'grid' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'
                 }`}
-                title="Social Feed Grid"
+                title="3D Brand Cards"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
@@ -133,20 +149,21 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
           </div>
         </div>
 
-        {/* Projects Display: Social Media Feed Grid or List */}
+        {/* Projects Display: 3D Brand Cards Grid or List */}
         {filteredProjects.length === 0 ? (
           <div className="py-16 text-center font-mono text-neutral-500 text-sm">
             No projects found matching &ldquo;{searchQuery}&rdquo;. Try another search or filter.
           </div>
         ) : viewMode === 'grid' ? (
-          /* Social Media Feed Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          /* 3D Brand Cards Grid with Central Logo and Orbiting Artwork */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
             <AnimatePresence>
-              {filteredProjects.map((project, idx) => (
-                <SocialWorkCard
-                  key={project.id}
-                  project={project}
-                  onOpen={handleOpenProject}
+              {clientGroups.map((group, idx) => (
+                <Brand3DCard
+                  key={group.client}
+                  client={group.client}
+                  projects={group.projects}
+                  onOpenProject={handleOpenProject}
                   index={idx}
                 />
               ))}

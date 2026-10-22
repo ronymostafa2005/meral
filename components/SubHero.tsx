@@ -36,10 +36,13 @@ export const SubHero: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-2xl sm:text-3xl md:text-5xl font-display font-medium leading-tight tracking-tight text-white"
           >
-            {practice.line1}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-400 font-bold">
+            {practice.line1}{" "}
+            <span
+              className="font-bold"
+              style={{ color: "var(--brand-hot, #ef4444)" }}
+            >
               {practice.highlight}
-            </span>{' '}
+            </span>{" "}
             {practice.line2}
           </motion.h2>
 
