@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Preloader } from './Preloader';
 import { Navbar } from './Navbar';
-import { Hero3D } from './Hero3D';
+import { HeroFolioblox } from './HeroFolioblox';
 import { SubHero } from './SubHero';
 import { FeaturedWork } from './FeaturedWork';
 import { ProjectDetailModal } from './ProjectDetailModal';
@@ -50,12 +50,12 @@ export default function App() {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
 
       {/* Navigation */}
-      <Navbar onOpenProjectBot={handleOpenProjectBot} />
+      {/* Navbar is embedded inside HeroFolioblox */}
 
       {/* Main Content Sections */}
       <main className="relative z-[1]">
         {/* Hero with portrait and program fan */}
-        <Hero3D />
+        <HeroFolioblox />
 
         {/* SubHero with Manifesto & Studio Metrics */}
         <SubHero />
