@@ -1,12 +1,13 @@
 import { cookies } from "next/headers";
 import { connection } from "next/server";
-import { readContent, writeContent } from "@/lib/contentStore";
+import { readContentAsync, writeContentAsync } from "@/lib/contentStore";
 import { cookieName, verifyToken } from "@/lib/ownerAuth";
 import { mergeContent } from "@/lib/siteContent";
 
 export async function GET() {
   await connection();
-  return Response.json(readContent(), {
+  const content = await readContentAsync();
+  return Response.json(content, {
     headers: { "Cache-Control": "no-store" },
   });
 }
@@ -19,6 +20,6 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const saved = writeContent(mergeContent(body));
+  const saved = await writeContentAsync(mergeContent(body));
   return Response.json(saved);
 }

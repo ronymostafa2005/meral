@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { sound } from "../utils/audio";
 
 export type FanCardData = {
@@ -14,43 +14,71 @@ export type FanCardData = {
   icon?: string;
 };
 
-// Default high-fashion creative artworks matching the user's reference screenshot
-const DEFAULT_PALETTES = [
-  {
-    image: "/work/unseen.jpg",
-    color: "#8A2BE2", // Deep Purple / Violet
-    gradient: "from-purple-900/60 via-purple-600/30 to-black/40",
+// Metadata for known design tools
+const TOOL_META: Record<
+  string,
+  { category: string; description: string; proficiency: number; gradient: string; shadow: string }
+> = {
+  ps: {
+    category: "Photo & Compositing",
+    description: "Advanced photo retouching, visual effects & digital compositing.",
+    proficiency: 97,
+    gradient: "from-[#001d40] to-[#0a4a8a]",
+    shadow: "rgba(49,168,255,0.45)",
   },
-  {
-    image: "/work/rise-2.jpg",
-    color: "#00E5FF", // Cyan / Neon Blue
-    gradient: "from-cyan-900/60 via-cyan-500/30 to-black/40",
+  ai: {
+    category: "Vector & Branding",
+    description: "Logos, brand identity systems, typography & illustration.",
+    proficiency: 99,
+    gradient: "from-[#2a1700] to-[#7a3600]",
+    shadow: "rgba(255,154,0,0.45)",
   },
-  {
-    image: "/work/rise-1.jpg",
-    color: "#FF1493", // Hot Pink / Magenta (Center Card)
-    gradient: "from-pink-900/60 via-rose-500/30 to-black/40",
+  id: {
+    category: "Print & Layout",
+    description: "Brochures, catalogues, editorial layouts & print production.",
+    proficiency: 92,
+    gradient: "from-[#33001a] to-[#8a0030]",
+    shadow: "rgba(255,51,102,0.45)",
   },
-  {
-    image: "/work/rise-3.jpg",
-    color: "#FFB800", // Amber / Cyber Gold
-    gradient: "from-amber-900/60 via-yellow-500/30 to-black/40",
+  ae: {
+    category: "Motion & Animation",
+    description: "Campaign motion graphics, animated visuals & VFX.",
+    proficiency: 88,
+    gradient: "from-[#0d0033] to-[#3a0080]",
+    shadow: "rgba(153,153,255,0.45)",
   },
-  {
-    image: "/work/village.jpg",
-    color: "#00E676", // Neon Green / Emerald
-    gradient: "from-emerald-900/60 via-teal-500/30 to-black/40",
+  pr: {
+    category: "Video Editing",
+    description: "Campaign films, social content & presentation reels.",
+    proficiency: 85,
+    gradient: "from-[#0d0033] to-[#3a0080]",
+    shadow: "rgba(153,153,255,0.45)",
   },
-];
+  lr: {
+    category: "Color Grading",
+    description: "Photography color treatment, presets & batch editing.",
+    proficiency: 90,
+    gradient: "from-[#001233] to-[#003380]",
+    shadow: "rgba(49,168,255,0.45)",
+  },
+  fg: {
+    category: "UI & Prototyping",
+    description: "Digital interfaces, social templates & interactive prototypes.",
+    proficiency: 82,
+    gradient: "from-[#1a0033] to-[#5a0099]",
+    shadow: "rgba(162,89,255,0.45)",
+  },
+};
 
-// Exact curved fan layout matching the user screenshot (Center upright at pinnacle, sides tilting down)
-const ARC_SLOTS = [
-  { offset: -2, x: "-55%", y: 38, rotate: -22, scale: 0.86, z: 10 },
-  { offset: -1, x: "-28%", y: 16, rotate: -11, scale: 0.96, z: 20 },
-  { offset: 0, x: "0%", y: 0, rotate: 0, scale: 1.1, z: 30 }, // Center upright
-  { offset: 1, x: "28%", y: 16, rotate: 11, scale: 0.96, z: 20 },
-  { offset: 2, x: "55%", y: 38, rotate: 22, scale: 0.86, z: 10 },
-];
+function getFallbackMeta(title: string) {
+  return {
+    category: "Design Tool",
+    description: `Professional-grade ${title} for creative workflow.`,
+    proficiency: 85,
+    gradient: "from-[#111] to-[#222]",
+    shadow: "rgba(255,255,255,0.2)",
+  };
+}
 
 export function CardFan({
   cards,
@@ -61,102 +89,193 @@ export function CardFan({
   caption?: string;
   onSelect?: (card: FanCardData) => void;
 }) {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
 
-  // Take up to 5 cards for the symmetrical fan matching the reference
-  const fanCards = cards.slice(0, 5);
-  const activeIdx = hoveredIdx !== null ? hoveredIdx : 2; // Default center is active
-  const activeCard = fanCards[activeIdx] || fanCards[2] || cards[0];
+  const activeCard = cards.find((c) => c.id === activeId) || cards[0];
+  const meta = activeCard
+    ? TOOL_META[activeCard.id] || getFallbackMeta(activeCard.title)
+    : null;
+
+  const handleSelect = (card: FanCardData) => {
+    if (card.id === activeId) {
+      setActiveId(null);
+    } else {
+      setActiveId(card.id);
+      sound.playClick?.();
+      onSelect?.(card);
+    }
+  };
 
   return (
-    <div className="relative mx-auto w-full max-w-[780px] flex flex-col items-center">
-      {/* 1. COMPACT FAN STAGE (Zero bloated height, cards fill the view) */}
-      <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px] flex items-center justify-center overflow-visible">
-        {/* Ambient atmospheric backglow */}
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/2 h-36 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 blur-3xl transition-colors duration-500"
-          style={{ background: DEFAULT_PALETTES[activeIdx]?.color || "#FF1493" }}
-        />
+    <div className="relative w-full flex flex-col gap-6">
+      {/* Caption */}
+      <div className="flex items-center gap-3">
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-neutral-500">
+          {caption || "Design tools in motion"}
+        </span>
+      </div>
 
-        {/* The 5 Fan Cards */}
-        {fanCards.map((card, i) => {
-          const slot = ARC_SLOTS[i] || ARC_SLOTS[2];
-          const isHovered = hoveredIdx === i;
-          const isCenter = slot.offset === 0;
-          const palette = DEFAULT_PALETTES[i] || DEFAULT_PALETTES[2];
-          const cardImage = card.image || palette.image;
+      {/* Tool Cards Grid */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
+        {cards.map((card, i) => {
+          const m = TOOL_META[card.id] || getFallbackMeta(card.title);
+          const isActive = activeId === card.id;
+          const isHovered = hovered === card.id;
 
           return (
             <motion.button
-              key={card.id || i}
+              key={card.id}
               type="button"
-              aria-label={card.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => handleSelect(card)}
               onMouseEnter={() => {
-                sound.playHover();
-                setHoveredIdx(i);
+                sound.playHover?.();
+                setHovered(card.id);
               }}
-              onMouseLeave={() => setHoveredIdx(null)}
-              onClick={() => {
-                sound.playClick();
-                onSelect?.(card);
-              }}
-              animate={{
-                x: slot.x,
-                y: isHovered ? slot.y - 18 : slot.y,
-                rotate: isHovered ? 0 : slot.rotate,
-                scale: isHovered ? slot.scale * 1.08 : slot.scale,
-                zIndex: isHovered ? 50 : slot.z,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 260,
-                damping: 22,
-              }}
-              style={{
-                transformOrigin: "50% 100%",
-              }}
-              className="group absolute w-[150px] sm:w-[180px] md:w-[200px] aspect-[4/5] cursor-pointer overflow-hidden rounded-2xl sm:rounded-3xl border border-white/25 bg-[#0a0a0d] shadow-[0_20px_45px_rgba(0,0,0,0.85)] outline-none transition-shadow duration-300 hover:border-white/70 hover:shadow-[0_25px_60px_rgba(0,0,0,0.95)]"
+              onMouseLeave={() => setHovered(null)}
+              className={`group relative flex flex-col items-center justify-center gap-2 rounded-2xl p-3 sm:p-4 cursor-pointer transition-all duration-300 border ${
+                isActive
+                  ? "border-white/40 bg-gradient-to-b shadow-2xl scale-105"
+                  : "border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]"
+              }`}
+              style={
+                isActive
+                  ? {
+                      background: `linear-gradient(160deg, ${m.gradient.replace("from-", "").replace("to-", "").split(" ")[0]} 0%, #0a0a0a 100%)`,
+                      boxShadow: `0 12px 40px ${m.shadow}, 0 0 0 1px rgba(255,255,255,0.15)`,
+                    }
+                  : isHovered
+                  ? {
+                      boxShadow: `0 8px 24px ${m.shadow}40`,
+                    }
+                  : {}
+              }
+              aria-label={card.title}
             >
-              {/* Card Photo Artwork */}
-              <img
-                src={cardImage}
-                alt={card.title}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-
-              {/* Tinted Color Gradient Overlay matching the reference */}
+              {/* Icon */}
               <div
-                className={`pointer-events-none absolute inset-0 bg-gradient-to-t ${palette.gradient} mix-blend-color opacity-70`}
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                className={`relative flex items-center justify-center rounded-xl transition-all duration-300 ${
+                  isActive ? "w-12 h-12 sm:w-14 sm:h-14" : "w-10 h-10 sm:w-12 sm:h-12"
+                }`}
+              >
+                {card.icon ? (
+                  <img
+                    src={card.icon}
+                    alt={card.title}
+                    className="w-full h-full object-contain drop-shadow-lg transition-transform duration-300 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-xl bg-white/10 flex items-center justify-center text-white font-bold text-lg">
+                    {card.title[0]}
+                  </div>
+                )}
 
-              {/* Top Software Icon Badge */}
-              {card.icon && (
-                <div className="absolute top-2.5 right-2.5 z-20 flex h-7 w-7 items-center justify-center rounded-xl bg-black/70 p-1 border border-white/20 backdrop-blur-md shadow-md">
-                  <img src={card.icon} alt="" className="h-full w-full object-contain" />
-                </div>
-              )}
-
-              {/* Bottom Subtle Label on Card */}
-              <div className="absolute inset-x-2 bottom-2 z-20 text-center">
-                <span className="font-display text-[10px] sm:text-xs font-bold text-white tracking-wider drop-shadow-md truncate block">
-                  {card.title}
-                </span>
+                {/* Active indicator dot */}
+                {isActive && (
+                  <motion.div
+                    layoutId="active-dot"
+                    className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white"
+                  />
+                )}
               </div>
+
+              {/* Tool name */}
+              <span
+                className={`font-mono text-[9px] sm:text-[10px] uppercase tracking-wider leading-none transition-colors duration-300 text-center ${
+                  isActive ? "text-white font-bold" : "text-neutral-500 group-hover:text-neutral-300"
+                }`}
+              >
+                {card.title}
+              </span>
             </motion.button>
           );
         })}
       </div>
 
-      {/* 2. COMPACT CENTERED CAPTION (Matching the screenshot: e.g. "Eyewear That Stands Out") */}
-      <div className="mt-2 text-center">
-        <h3 className="font-display text-sm sm:text-base font-bold text-white tracking-wide transition-all">
-          {activeCard?.title ? `${activeCard.title} • Motion & Art Direction` : "Design Tools In Motion"}
-        </h3>
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-neutral-500 mt-0.5">
-          {caption || "Graphic design & campaign systems"}
-        </p>
-      </div>
+      {/* Active Tool Detail Panel */}
+      <AnimatePresence mode="wait">
+        {activeCard && meta && (
+          <motion.div
+            key={activeCard.id}
+            initial={{ opacity: 0, height: 0, y: -10 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={{ opacity: 0, height: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div
+              className="rounded-2xl border border-white/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
+              style={{
+                background: `linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.6) 100%)`,
+                boxShadow: `0 4px 30px ${meta.shadow}20`,
+              }}
+            >
+              {/* Icon large */}
+              <div className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-2xl border border-white/10 bg-white/5">
+                {activeCard.icon ? (
+                  <img src={activeCard.icon} alt={activeCard.title} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                ) : (
+                  <span className="text-white font-bold text-2xl">{activeCard.title[0]}</span>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-1 flex-wrap">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-white leading-none">
+                    {activeCard.title}
+                  </h3>
+                  <span
+                    className="font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-full border"
+                    style={{
+                      color: activeCard.to || "#c4a574",
+                      borderColor: `${activeCard.to || "#c4a574"}40`,
+                      background: `${activeCard.to || "#c4a574"}10`,
+                    }}
+                  >
+                    {meta.category}
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mt-1">
+                  {meta.description}
+                </p>
+
+                {/* Proficiency Bar */}
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="font-mono text-[9px] text-neutral-500 uppercase tracking-widest shrink-0">
+                    Proficiency
+                  </span>
+                  <div className="flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${meta.proficiency}%` }}
+                      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                      className="h-full rounded-full"
+                      style={{ background: `linear-gradient(90deg, ${activeCard.to || "#c4a574"}, #ffffff80)` }}
+                    />
+                  </div>
+                  <span className="font-mono text-[10px] font-bold text-white shrink-0">
+                    {meta.proficiency}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Close hint */}
+              <button
+                type="button"
+                onClick={() => setActiveId(null)}
+                className="shrink-0 self-start sm:self-center text-neutral-500 hover:text-white transition-colors font-mono text-[10px] uppercase tracking-wider cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
