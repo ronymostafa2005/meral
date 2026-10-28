@@ -46,14 +46,16 @@ const archiveStyles = `
                 filter 0.45s ease;
   }
   /* The row's widths are redistributed, not overridden: the open card asks
-     for 2.6 shares against its neighbours' one, so three cards resolve to
-     roughly 57 / 21 / 21 without a single measurement in JS.
+     for seven shares against its neighbours' one, so three cards resolve to
+     roughly 78 / 11 / 11 without a single measurement in JS — the open piece
+     takes the row and its neighbours fold to reachable slivers.
 
-     The share is deliberately modest. The work is upright and the row is a
-     landscape strip, so every extra pixel of card width is surround, not
-     picture — past this point the card grows and the artwork does not. */
+     Width alone does not enlarge the work: these are 4:5 key visuals, so the
+     picture is capped by the row's height, and card width past that point
+     becomes mat rather than image. The row height below is the lever that
+     actually makes the piece bigger. */
   .archive-card:hover,
-  .archive-card:focus-within { flex-grow: 2.6; }
+  .archive-card:focus-within { flex-grow: 7; }
 
   /* Folded and at rest the frame is taller than it is wide, which is the
      artwork's own shape, so cover fills it with almost nothing lost. Only the
@@ -440,7 +442,10 @@ export function ProjectArchive() {
           {rows.map((row, rowIndex) => (
             <div
               key={`row-${rowIndex}`}
-              className="archive-row flex flex-col gap-4 lg:h-[32rem] lg:flex-row lg:gap-3 xl:h-[36rem]"
+              /* Tall on purpose: the work is 4:5, so the row's height is what
+                 sets how large a piece can be drawn. Capped at lg so a row
+                 still fits a 768px laptop, and opened up at xl. */
+              className="archive-row flex flex-col gap-4 lg:h-[40rem] lg:flex-row lg:gap-3 xl:h-[52rem]"
             >
               {row.map((item, i) => (
                 <ArchiveCard key={item.id} item={item} index={rowIndex * ROW_SIZE + i} />
