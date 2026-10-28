@@ -187,7 +187,10 @@ function ArchiveCard({
               ? `${item.title} — ${images.length} frames. Open full size.`
               : `${item.title} — open full size.`
           }
-          className="absolute inset-0 block w-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand,#c4a574)]"
+          /* Tailwind v4 gives buttons `cursor: default`, and this one covers
+             the whole card — without the class it overrides the wrapper and
+             the image reads as unclickable. */
+          className="absolute inset-0 block w-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand,#c4a574)]"
         >
           {/* Every frame is mounted and cross-faded. Swapping one src flashes
               white while the next file decodes; only the first loads eagerly.
@@ -281,7 +284,7 @@ function ArchiveCard({
                     event.stopPropagation();
                     step(-1);
                   }}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
+                  className="grid h-7 w-7 cursor-pointer place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
@@ -292,7 +295,7 @@ function ArchiveCard({
                     event.stopPropagation();
                     step(1);
                   }}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
+                  className="grid h-7 w-7 cursor-pointer place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
