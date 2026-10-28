@@ -27,6 +27,9 @@ async function blobUpload(name: string, bytes: Buffer, contentType: string): Pro
     access: "public",
     contentType,
     addRandomSuffix: false,
+    // Names already carry a timestamp and four random bytes, so a collision
+    // would need the same millisecond; this just stops that being fatal.
+    allowOverwrite: true,
   });
   return url;
 }

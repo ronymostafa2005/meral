@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { cookieName, verifyToken } from "@/lib/ownerAuth";
 import { saveUpload } from "@/lib/uploadStore";
-import { StorageConfigError } from "@/lib/storageEnv";
+import { storageErrorMessage } from "@/lib/storageEnv";
 
 const TYPES = new Map([
   ["image/jpeg", "jpg"],
@@ -42,12 +42,9 @@ export async function POST(request: Request) {
     return Response.json({ ok: true, url });
   } catch (err) {
     console.error("[upload] Could not store image:", err);
-    // Past verifyToken, so this is the owner: a misconfiguration is worth
+    // Past verifyToken, so this is the owner: what actually failed is worth
     // naming rather than hiding behind "please try again".
-    const error =
-      err instanceof StorageConfigError
-        ? err.message
-        : "Could not store the image. Please try again.";
+    const error = storageErrorMessage(err, "Could not store the image.");
     return Response.json({ ok: false, error }, { status: 500 });
   }
 }

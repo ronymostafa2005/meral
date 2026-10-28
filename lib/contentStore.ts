@@ -70,6 +70,10 @@ async function blobWrite(content: SiteContent): Promise<void> {
     access: "public",
     contentType: "application/json",
     addRandomSuffix: false,
+    // The content always lands on the same key, and @vercel/blob throws on an
+    // existing pathname unless told otherwise. Without this the first publish
+    // of a deployment succeeds and every one after it fails.
+    allowOverwrite: true,
   });
 }
 

@@ -3,7 +3,7 @@ import { connection } from "next/server";
 import { readContentAsync, writeContentAsync } from "@/lib/contentStore";
 import { cookieName, verifyToken } from "@/lib/ownerAuth";
 import { mergeContent } from "@/lib/siteContent";
-import { StorageConfigError } from "@/lib/storageEnv";
+import { storageErrorMessage } from "@/lib/storageEnv";
 
 export async function GET() {
   await connection();
@@ -32,12 +32,9 @@ export async function PUT(request: Request) {
     // Never answer 200 here: the dashboard would tell the owner their work
     // was published when nothing was actually stored.
     console.error("[content] Could not persist content:", err);
-    // Past verifyToken, so this is the owner: a misconfiguration is worth
+    // Past verifyToken, so this is the owner: what actually failed is worth
     // naming rather than hiding behind "please try again".
-    const error =
-      err instanceof StorageConfigError
-        ? err.message
-        : "Could not save your changes. Please try again.";
+    const error = storageErrorMessage(err, "Could not save your changes.");
     return Response.json({ ok: false, error }, { status: 500 });
   }
 }

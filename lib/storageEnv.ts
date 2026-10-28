@@ -33,6 +33,24 @@ export function blobConfigured() {
  * Throws when a runtime write is about to be attempted on Vercel with no blob
  * store attached. Call before falling back to a local write.
  */
+/**
+ * Turns a storage failure into something the owner can act on.
+ *
+ * Both callers sit behind `verifyToken`, so the reader is the site owner, not
+ * a visitor. A generic "please try again" sends them to the Vercel function
+ * logs to find out what the SDK actually said; this puts it on screen. The
+ * blob SDK's own messages are specific — a missing store, an expired token, a
+ * suspended store all read differently — and none of them disclose a secret.
+ */
+export function storageErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof StorageConfigError) return error.message;
+  const detail = error instanceof Error ? error.message.trim() : "";
+  if (!detail) return fallback;
+  // Bounded: a stack or a huge upstream body should not land in the toast.
+  const clipped = detail.length > 180 ? `${detail.slice(0, 180)}…` : detail;
+  return `${fallback} (${clipped})`;
+}
+
 export function assertWritableStorage() {
   if (onVercel() && !blobConfigured()) {
     throw new StorageConfigError(
