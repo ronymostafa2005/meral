@@ -56,7 +56,16 @@ async function blobRead(): Promise<SiteContent | null> {
     const { blobs } = await list({ prefix: BLOB_KEY });
     const blob = blobs.find((b) => b.pathname === BLOB_KEY);
     if (!blob) return null;
-    const res = await fetch(blob.url, { cache: "no-store" });
+
+    /* The content always lands on the same pathname, so every publish reuses
+       one URL — and blobs are served from the edge cache. `cache: "no-store"`
+       only bypasses this runtime's own fetch cache, not the CDN, so a read
+       after the memory cache expired could be answered with a previous
+       publish: a save appeared to work, then the site quietly reverted.
+       `uploadedAt` changes on every overwrite, so hanging it off the URL
+       makes each publish a distinct cache key and the read always current. */
+    const version = blob.uploadedAt instanceof Date ? blob.uploadedAt.getTime() : Date.now();
+    const res = await fetch(`${blob.url}?v=${version}`, { cache: "no-store" });
     if (!res.ok) return null;
     return mergeContent(await res.json());
   } catch {
@@ -74,6 +83,12 @@ async function blobWrite(content: SiteContent): Promise<void> {
     // existing pathname unless told otherwise. Without this the first publish
     // of a deployment succeeds and every one after it fails.
     allowOverwrite: true,
+    // Blobs default to a one-month edge cache, which is right for an image
+    // under a unique name and wrong for a document rewritten in place. The
+    // read above is versioned so freshness does not depend on this, but a
+    // month-old copy should not be sitting at the edge either. 60s is the
+    // SDK's floor.
+    cacheControlMaxAge: 60,
   });
 }
 
