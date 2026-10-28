@@ -1,34 +1,18 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { ArrowUpRight, BookOpen, LayoutGrid, List, Search } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ArrowUpRight, BookOpen, List, Search } from 'lucide-react';
 import { Project } from '../types/portfolio';
 import { filterProjects } from '../utils/logic';
 import { sound } from '../utils/audio';
 import { LiquidWaveText } from './LiquidWaveText';
 import { ScrambleText } from './ScrambleText';
 import { BookFolio } from './BookFolio';
-import { Brand3DCard } from './Brand3DCard';
 import { useSite } from './SiteProvider';
 
 interface FeaturedWorkProps {
   onSelectProject: (project: Project) => void;
-}
-
-function groupByClient(projects: Project[]) {
-  const order: string[] = [];
-  const groups = new Map<string, Project[]>();
-  for (const project of projects) {
-    const existing = groups.get(project.client);
-    if (existing) {
-      existing.push(project);
-    } else {
-      groups.set(project.client, [project]);
-      order.push(project.client);
-    }
-  }
-  return order.map((client) => ({ client, projects: groups.get(client) ?? [] }));
 }
 
 export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) => {
@@ -36,11 +20,10 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
   const works = content.works;
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'book' | 'grid' | 'list'>('book');
+  const [viewMode, setViewMode] = useState<'book' | 'list'>('book');
 
   const categories = ['All', ...Array.from(new Set(works.projects.map((project) => project.category).filter(Boolean)))];
   const filteredProjects = filterProjects(works.projects, selectedCategory, searchQuery);
-  const clientGroups = groupByClient(filteredProjects);
 
   const handleCategoryChange = (cat: string) => {
     sound.playWaterDrop();
@@ -120,7 +103,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
               )}
             </div>
 
-            {/* View Mode Book/Grid/List */}
+            {/* View Mode Book/List */}
             <div className="flex items-center p-1 rounded-full bg-[#111111] border border-white/10">
               <button
                 onClick={() => {
@@ -138,18 +121,6 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
               <button
                 onClick={() => {
                   sound.playClick();
-                  setViewMode('grid');
-                }}
-                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-black' : 'text-neutral-400 hover:text-white'
-                }`}
-                title="3D Brand Orbit"
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => {
-                  sound.playClick();
                   setViewMode('list');
                 }}
                 className={`p-1.5 rounded-full transition-colors cursor-pointer ${
@@ -163,7 +134,7 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
           </div>
         </div>
 
-        {/* Projects Display: 3D Book Folio, 3D Brand Orbit, or List */}
+        {/* Projects Display: 3D Book Folio or List */}
         {filteredProjects.length === 0 ? (
           <div className="py-16 text-center font-mono text-neutral-500 text-sm">
             No projects found matching &ldquo;{searchQuery}&rdquo;. Try another search or filter.
@@ -174,21 +145,6 @@ export const FeaturedWork: React.FC<FeaturedWorkProps> = ({ onSelectProject }) =
             projects={filteredProjects}
             onOpenProject={handleOpenProject}
           />
-        ) : viewMode === 'grid' ? (
-          /* 3D Brand Cards Grid with Central Logo and Orbiting Artwork */
-          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
-            <AnimatePresence>
-              {clientGroups.map((group, idx) => (
-                <Brand3DCard
-                  key={group.client}
-                  client={group.client}
-                  projects={group.projects}
-                  onOpenProject={handleOpenProject}
-                  index={idx}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
         ) : (
           /* List View with Full Horizontal Row */
           <div className="flex flex-col divide-y divide-white/10">
