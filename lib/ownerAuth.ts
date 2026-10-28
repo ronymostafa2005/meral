@@ -32,6 +32,9 @@ export function cookieName() {
 export function credentialsMatch(email: string, password: string) {
   const expectedEmail = setting("DASHBOARD_EMAIL").toLowerCase();
   const expectedPassword = setting("DASHBOARD_PASSWORD");
+  // Keyboard layouts that swap " and @ (Arabic, French, and others) make the
+  // owner type merall22"gmail.com. Treat that as the @ they meant rather than
+  // failing the sign-in; a real address never contains a double quote.
   const given = email.trim().toLowerCase().replace(/"/g, "@");
   if (!expectedEmail || !expectedPassword) return false;
   return safeEqual(given, expectedEmail) && safeEqual(password, expectedPassword);

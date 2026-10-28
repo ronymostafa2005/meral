@@ -21,33 +21,31 @@ interface BookFolioProps {
 }
 
 export const BookFolio: React.FC<BookFolioProps> = ({ projects, onOpenProject }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Keep index within bounds if projects change
-  useEffect(() => {
-    if (activeIndex >= projects.length) {
-      setActiveIndex(Math.max(0, projects.length - 1));
-    }
-  }, [projects.length, activeIndex]);
+  // Keep the index within bounds if projects change. Clamped while rendering
+  // rather than corrected in an effect: deleting a project in the dashboard
+  // would otherwise leave one render pointing past the end of the list.
+  const activeIndex = Math.min(selectedIndex, Math.max(0, projects.length - 1));
 
   const activeProject = projects[activeIndex] || projects[0];
 
   const handleSelect = (idx: number) => {
     if (idx === activeIndex) return;
     sound.playWaterRipple();
-    setActiveIndex(idx);
+    setSelectedIndex(idx);
   };
 
   const handlePrev = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     sound.playWaterDrop();
-    setActiveIndex((prev) => (prev > 0 ? prev - 1 : projects.length - 1));
+    setSelectedIndex(activeIndex > 0 ? activeIndex - 1 : projects.length - 1);
   };
 
   const handleNext = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     sound.playWaterDrop();
-    setActiveIndex((prev) => (prev < projects.length - 1 ? prev + 1 : 0));
+    setSelectedIndex(activeIndex < projects.length - 1 ? activeIndex + 1 : 0);
   };
 
   // Keyboard navigation (Left / Right arrows)

@@ -166,7 +166,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <div>
                   <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-red-500 font-bold mb-4">
                     <Droplets className="w-3.5 h-3.5 text-red-500" />
-                    <span>// MEASURABLE IMPACT</span>
+                    <span>{"// MEASURABLE IMPACT"}</span>
                   </div>
                   <ul className="space-y-4">
                     {project.results.map((result) => (

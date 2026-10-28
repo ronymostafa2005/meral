@@ -24,6 +24,13 @@
 .DS_Store
 *.pem
 
+# dashboard content + uploads written at runtime (blob storage in production)
+/data/site-content.json
+/public/uploads
+
+# MCP tool output (Playwright traces, snapshots, console logs)
+/.playwright-mcp
+
 # debug
 npm-debug.log*
 yarn-debug.log*
