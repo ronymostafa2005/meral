@@ -11,6 +11,13 @@ interface HeroStageProps {
 }
 
 /**
+ * The tone the photo's own surround settles to. Both the foot of the phone
+ * banner and the field of copy beneath it start here, so the two meet without
+ * a seam and the whole card reads as one lit space.
+ */
+const BAND_FOOT = "color-mix(in srgb, var(--brand-hot, #f95721) 22%, #120302)";
+
+/**
  * The opening card.
  *
  * Everything on it comes from the dashboard, and the atmosphere is mixed from
@@ -66,15 +73,20 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onOpenProjectBot }) => {
           {/* Portrait fills the card. The shot carries its own glow, so it
               sits over the radial and keeps its colour; the overlays below
               only buy back contrast where type sits on top of it. */}
-          <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
+          {/* On a phone the card is tall and narrow while the shot is wide, so
+              filling it would zoom into a fragment of her face. Below lg the
+              photo becomes a banner band across the top instead: the band is
+              shorter than it is wide, so cover scales to the band's height and
+              the whole picture stays in frame, with the copy below it. */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-80 overflow-hidden sm:h-96 lg:inset-0 lg:h-full">
             <img
               src={hero.portrait}
               alt={hero.portraitAlt}
-              /* Anchored to the top of the frame: cover has to crop
+              /* Desktop anchors to the top of the frame: cover has to crop
                  somewhere, and taking it off the bottom costs a little
                  shoulder — which the disciplines row covers anyway — rather
                  than the top of her head. */
-              className="h-full w-full object-cover object-[72%_top] brightness-[0.98] contrast-[1.04] lg:object-[62%_top]"
+              className="h-full w-full object-cover object-[55%_center] brightness-[0.98] contrast-[1.04] lg:object-[62%_top]"
             />
             {/* Feathers the photo's rectangle into the radial behind it. */}
             <div
@@ -85,28 +97,57 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onOpenProjectBot }) => {
                   " color-mix(in srgb, #120302 45%, transparent) 86%, #120302 100%)",
               }}
             />
-            {/* Clears the left column for the headline. */}
+            {/* The side gradients clear the headline and statement columns,
+                which only exist once the copy sits over the photo. */}
             <div
-              className="absolute inset-0"
+              className="absolute inset-0 hidden lg:block"
               style={{
                 background:
                   "linear-gradient(to right, rgba(18,3,2,0.78) 0%," +
                   " rgba(18,3,2,0.34) 20%, rgba(18,3,2,0.08) 36%, transparent 50%)",
               }}
             />
-            {/* And the right column, for the statement. */}
             <div
-              className="absolute inset-0"
+              className="absolute inset-0 hidden lg:block"
               style={{
                 background:
                   "linear-gradient(to left, rgba(18,3,2,0.66) 0%," +
                   " rgba(18,3,2,0.28) 14%, transparent 30%)",
               }}
             />
-            {/* Foot, under the disciplines row, and the nav strip above. */}
-            {/* Foot, under the disciplines row, and the nav strip above. */}
-            <div className="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#120302] via-[#120302]/70 to-transparent" />
+            {/* Foot: under the disciplines row on desktop, and the seam where
+                the banner band meets the copy on a phone. */}
+            {/* Desktop: settles the photo under the disciplines row. */}
+            <div className="absolute inset-x-0 bottom-0 hidden h-44 bg-gradient-to-t from-[#120302] via-[#120302]/70 to-transparent lg:block" />
+            {/* Phone: hands the band off to the field below in the same tone,
+                so there is no seam where the photo stops. */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-24 lg:hidden"
+              style={{
+                background:
+                  "linear-gradient(to top, " +
+                  BAND_FOOT +
+                  " 0%, color-mix(in srgb, var(--brand-hot, #f95721) 16%, #120302) 55%, transparent 100%)",
+              }}
+            />
           </div>
+
+          {/* Below the band the raw radial would leave white copy on bright
+              orange. Rather than blacking it out, this carries the same deep
+              red the photo sits in down through the copy, so the card reads as
+              one lit room rather than a photo pasted onto a dark panel.
+              Phone only — on lg the photo covers this area itself. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 top-80 z-[2] sm:top-96 lg:hidden"
+            style={{
+              background:
+                "linear-gradient(to bottom, " +
+                BAND_FOOT +
+                " 0%," +
+                " color-mix(in srgb, var(--brand-hot, #f95721) 15%, #0f0201) 42%," +
+                " color-mix(in srgb, var(--brand-hot, #f95721) 8%, #0c0201) 100%)",
+            }}
+          />
 
           {/* 1. NAVIGATION INSIDE THE CARD */}
           <header className="relative z-30 flex items-center justify-between px-6 pb-4 pt-7 sm:px-10 lg:px-14">
@@ -164,7 +205,9 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onOpenProjectBot }) => {
           </header>
 
           {/* 2. CENTRE STAGE */}
-          <div className="relative z-10 flex min-h-[560px] w-full flex-col justify-between px-6 pb-8 pt-4 sm:min-h-[620px] sm:px-10 sm:pt-8 lg:min-h-[700px] lg:px-14">
+          {/* Top padding clears the banner band on a phone (band height minus
+              the nav that overlaps it); on lg the copy sits over the photo. */}
+          <div className="relative z-10 flex min-h-[560px] w-full flex-col justify-between px-6 pb-8 pt-60 sm:min-h-[620px] sm:px-10 sm:pt-72 lg:min-h-[700px] lg:px-14 lg:pt-8">
 
             {/* Typography */}
             <div className="relative z-20 my-auto flex w-full flex-col items-start gap-6 pt-6 sm:gap-8 lg:grid lg:grid-cols-12 lg:items-center lg:pt-0">
