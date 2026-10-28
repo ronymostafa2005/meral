@@ -17,6 +17,7 @@
 import fs from "fs";
 import path from "path";
 import { mergeContent, type SiteContent } from "./siteContent";
+import { assertWritableStorage, blobConfigured } from "./storageEnv";
 
 // ─── In-memory cache ─────────────────────────────────────────────────────────
 // Each serverless instance has its own cache, and a save only refreshes the
@@ -32,7 +33,7 @@ const BLOB_KEY = "site-content.json";
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isVercel() {
-  return !!process.env.BLOB_READ_WRITE_TOKEN;
+  return blobConfigured();
 }
 
 /** Returns the cached content while it is still fresh, otherwise null. */
@@ -87,6 +88,8 @@ function localRead(): SiteContent | null {
 }
 
 function localWrite(content: SiteContent): void {
+  // On Vercel this path cannot succeed; say so instead of throwing EROFS.
+  assertWritableStorage();
   const filePath = contentPath();
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, JSON.stringify(content, null, 2), "utf8");

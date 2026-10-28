@@ -17,12 +17,9 @@
 
 import fs from "fs";
 import path from "path";
+import { assertWritableStorage, blobConfigured } from "./storageEnv";
 
 const UPLOAD_DIR = "uploads";
-
-function isVercel() {
-  return !!process.env.BLOB_READ_WRITE_TOKEN;
-}
 
 async function blobUpload(name: string, bytes: Buffer, contentType: string): Promise<string> {
   const { put } = await import("@vercel/blob");
@@ -35,6 +32,8 @@ async function blobUpload(name: string, bytes: Buffer, contentType: string): Pro
 }
 
 function localUpload(name: string, bytes: Buffer): string {
+  // On Vercel this path cannot succeed; say so instead of throwing EROFS.
+  assertWritableStorage();
   const dir = path.join(process.cwd(), "public", UPLOAD_DIR);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, name), bytes);
@@ -50,5 +49,5 @@ export async function saveUpload(
   bytes: Buffer,
   contentType: string,
 ): Promise<string> {
-  return isVercel() ? blobUpload(name, bytes, contentType) : localUpload(name, bytes);
+  return blobConfigured() ? blobUpload(name, bytes, contentType) : localUpload(name, bytes);
 }
