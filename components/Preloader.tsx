@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { sound } from '../utils/audio';
 import { ArrowRight, Droplets } from 'lucide-react';
@@ -50,6 +50,17 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     };
   }, [frames.length, onComplete]);
 
+  // Declared before the effect below that calls it, so the effect can list it
+  // as a dependency and always sees the current isExiting value.
+  const handleFinish = useCallback(() => {
+    if (isExiting) return;
+    setIsExiting(true);
+    sound.playSuccess();
+    setTimeout(() => {
+      onComplete();
+    }, 280);
+  }, [isExiting, onComplete]);
+
   useEffect(() => {
     if (progress >= 100) {
       const timer = setTimeout(() => {
@@ -57,16 +68,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       }, 160);
       return () => clearTimeout(timer);
     }
-  }, [progress]);
-
-  const handleFinish = () => {
-    if (isExiting) return;
-    setIsExiting(true);
-    sound.playSuccess();
-    setTimeout(() => {
-      onComplete();
-    }, 280);
-  };
+  }, [progress, handleFinish]);
 
   return (
     <AnimatePresence>

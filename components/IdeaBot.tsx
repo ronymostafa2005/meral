@@ -167,7 +167,7 @@ export const IdeaBot: React.FC = () => {
 
                 {/* Estimate Summary Card */}
                 <div className="max-w-md mx-auto bg-neutral-950 border border-red-500/20 rounded-2xl p-5 text-left text-xs space-y-2.5">
-                  <div className="text-red-500 uppercase tracking-widest font-bold">// INSTANT SCOPE PROJECTION</div>
+                  <div className="text-red-500 uppercase tracking-widest font-bold">{"// INSTANT SCOPE PROJECTION"}</div>
                   <div className="flex justify-between text-neutral-300">
                     <span>Project Focus:</span>
                     <span className="text-white font-semibold">{formData.projectType || 'Digital Experience'}</span>

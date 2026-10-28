@@ -62,12 +62,15 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenProjectBot }) => {
 
   return (
     <>
+      {/* The hero card carries its own navigation, so this fixed header stays
+          out of the way until the visitor has scrolled past it. */}
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#050505]/85 backdrop-blur-md border-b border-white/10 py-3'
-            : 'bg-transparent py-5'
+            ? 'bg-[#050505]/85 backdrop-blur-md border-b border-white/10 py-3 translate-y-0 opacity-100'
+            : 'bg-transparent py-5 -translate-y-full opacity-0 pointer-events-none'
         }`}
+        aria-hidden={!scrolled}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 flex items-center justify-between">
           {/* Logo */}

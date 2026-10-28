@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Preloader } from './Preloader';
 import { Navbar } from './Navbar';
-import { HeroFolioblox } from './HeroFolioblox';
+import { HeroStage } from './HeroStage';
+import { ToolStage } from './ToolStage';
 import { SubHero } from './SubHero';
 import { FeaturedWork } from './FeaturedWork';
+import { ProjectArchive } from './ProjectArchive';
 import { ProjectDetailModal } from './ProjectDetailModal';
 import { AboutSection } from './AboutSection';
 import { AwardsSection } from './AwardsSection';
@@ -18,7 +20,7 @@ import { useSite } from './SiteProvider';
 export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const { content, owner } = useSite();
+  const { content } = useSite();
 
   useEffect(() => {
     // Check if ?autostart=1 is present
@@ -50,18 +52,26 @@ export default function App() {
       {loading && <Preloader onComplete={() => setLoading(false)} />}
 
       {/* Navigation */}
-      {/* Navbar is embedded inside HeroFolioblox */}
+      <Navbar onOpenProjectBot={handleOpenProjectBot} />
 
       {/* Main Content Sections */}
       <main className="relative z-[1]">
-        {/* Hero with portrait and program fan */}
-        <HeroFolioblox />
+        {/* Hero card — carries its own navigation; the fixed header above
+            stays hidden until the visitor scrolls past it. */}
+        <HeroStage onOpenProjectBot={handleOpenProjectBot} />
+
+        {/* The design-tool fan. It used to live inside the old hero, so it
+            sits here in its own right now that the hero has been replaced. */}
+        <ToolStage />
 
         {/* SubHero with Manifesto & Studio Metrics */}
         <SubHero />
 
         {/* Featured Work with Filters, Grid/List & Case Studies */}
         <FeaturedWork onSelectProject={(project) => setSelectedProject(project)} />
+
+        {/* The rest of the archive, paged, directly under the featured work */}
+        <ProjectArchive />
 
         {/* About Studio, Capabilities & Client Marquee */}
         <AboutSection />
@@ -75,15 +85,6 @@ export default function App() {
 
       {/* Footer */}
       <Footer />
-
-      {owner && (
-        <a
-          href="/dashboard"
-          className="fixed bottom-5 left-5 z-40 rounded-full border border-white/20 bg-black/80 px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] text-white shadow-lg backdrop-blur"
-        >
-          Edit portfolio
-        </a>
-      )}
 
       {/* Case Study Detail Modal */}
       <ProjectDetailModal

@@ -9,19 +9,42 @@
  *
  * • Locally (development): falls back to writing data/site-content.json
  *   to disk, exactly as before.
+ *
+ * Server-only module: it is imported by app/api/content/route.ts and must
+ * never be pulled into a client component, because it reads the filesystem.
  */
 
+import fs from "fs";
+import path from "path";
 import { mergeContent, type SiteContent } from "./siteContent";
 
-// ─── In-memory cache (survives within the same function instance) ───────────
+// ─── In-memory cache ─────────────────────────────────────────────────────────
+// Each serverless instance has its own cache, and a save only refreshes the
+// instance that handled it. Without an expiry, every other warm instance would
+// keep serving pre-save content until it cold-started, so the owner saves and
+// visitors still see the old site. The TTL bounds that staleness.
 let memCache: SiteContent | null = null;
+let memCacheAt = 0;
 
+const CACHE_TTL_MS = 5000;
 const BLOB_KEY = "site-content.json";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isVercel() {
   return !!process.env.BLOB_READ_WRITE_TOKEN;
+}
+
+/** Returns the cached content while it is still fresh, otherwise null. */
+function fresh(): SiteContent | null {
+  if (memCache && Date.now() - memCacheAt < CACHE_TTL_MS) return memCache;
+  return null;
+}
+
+function remember(content: SiteContent): SiteContent {
+  memCache = content;
+  memCacheAt = Date.now();
+  return content;
 }
 
 // ─── Vercel Blob helpers (dynamic import to avoid errors locally) ────────────
@@ -41,106 +64,65 @@ async function blobRead(): Promise<SiteContent | null> {
 }
 
 async function blobWrite(content: SiteContent): Promise<void> {
-  try {
-    const { put } = await import("@vercel/blob");
-    await put(BLOB_KEY, JSON.stringify(content, null, 2), {
-      access: "public",
-      contentType: "application/json",
-      addRandomSuffix: false,
-    });
-  } catch (err) {
-    console.error("[contentStore] Blob write failed:", err);
-  }
+  const { put } = await import("@vercel/blob");
+  await put(BLOB_KEY, JSON.stringify(content, null, 2), {
+    access: "public",
+    contentType: "application/json",
+    addRandomSuffix: false,
+  });
 }
 
 // ─── Local file helpers ───────────────────────────────────────────────────────
 
+function contentPath() {
+  return path.join(process.cwd(), "data", "site-content.json");
+}
+
 function localRead(): SiteContent | null {
   try {
-    const fs = require("fs") as typeof import("fs");
-    const path = require("path") as typeof import("path");
-    const filePath = path.join(process.cwd(), "data", "site-content.json");
-    const raw = fs.readFileSync(filePath, "utf8");
-    return mergeContent(JSON.parse(raw));
+    return mergeContent(JSON.parse(fs.readFileSync(contentPath(), "utf8")));
   } catch {
     return null;
   }
 }
 
 function localWrite(content: SiteContent): void {
-  try {
-    const fs = require("fs") as typeof import("fs");
-    const path = require("path") as typeof import("path");
-    const filePath = path.join(process.cwd(), "data", "site-content.json");
-    fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, JSON.stringify(content, null, 2), "utf8");
-  } catch (err) {
-    console.error("[contentStore] Local write failed:", err);
-  }
+  const filePath = contentPath();
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(content, null, 2), "utf8");
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
 /**
- * Read the current site content.
- * Returns memCache if available, otherwise reads from blob/file.
- */
-export function readContent(): SiteContent {
-  if (memCache) return memCache;
-  // Sync fallback: local file (works in dev and for initial Vercel cold boot)
-  const local = localRead();
-  if (local) {
-    memCache = local;
-    return local;
-  }
-  const defaulted = mergeContent(null);
-  memCache = defaulted;
-  return defaulted;
-}
-
-/**
- * Async version — prefers blob in production. Use this in API routes.
+ * Read the current site content. Prefers blob in production.
  */
 export async function readContentAsync(): Promise<SiteContent> {
-  if (memCache) return memCache;
+  const cached = fresh();
+  if (cached) return cached;
+
   if (isVercel()) {
     const remote = await blobRead();
-    if (remote) {
-      memCache = remote;
-      return remote;
-    }
+    if (remote) return remember(remote);
   }
   const local = localRead();
-  if (local) {
-    memCache = local;
-    return local;
-  }
-  const defaulted = mergeContent(null);
-  memCache = defaulted;
-  return defaulted;
+  if (local) return remember(local);
+
+  return remember(mergeContent(null));
 }
 
 /**
- * Write new content and persist it.
+ * Write new content and persist it. Throws if persistence fails, so the
+ * caller can tell the owner their save did not stick.
  */
 export async function writeContentAsync(content: SiteContent): Promise<SiteContent> {
   const next = mergeContent(content);
-  memCache = next;
 
   if (isVercel()) {
     await blobWrite(next);
   } else {
     localWrite(next);
   }
-  return next;
-}
 
-/** Sync write — local only (kept for backward-compat, no-op on Vercel). */
-export function writeContent(content: SiteContent): SiteContent {
-  const next = mergeContent(content);
-  memCache = next;
-  if (!isVercel()) {
-    localWrite(next);
-  }
-  return next;
+  return remember(next);
 }

@@ -31,6 +31,23 @@ export interface Project {
   clientLogo?: string;
 }
 
+/**
+ * A single entry in the full project archive shown beneath the featured work.
+ * Lighter than `Project`: no case study, just the cover set and the two titles
+ * the card prints side by side.
+ */
+export interface ArchiveItem {
+  id: string;
+  /** English title, printed on the left of the card. */
+  title: string;
+  /** Arabic title, printed on the right. Optional — the card drops it if empty. */
+  titleAr: string;
+  category: string;
+  description: string;
+  /** First image is the cover; the count renders as the "N frames" badge. */
+  images: string[];
+}
+
 export interface AwardItem {
   id: string;
   title: string;

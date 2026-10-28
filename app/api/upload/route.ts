@@ -1,9 +1,8 @@
 import { randomBytes } from "crypto";
-import fs from "fs";
-import path from "path";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
 import { cookieName, verifyToken } from "@/lib/ownerAuth";
+import { saveUpload } from "@/lib/uploadStore";
 
 const TYPES = new Map([
   ["image/jpeg", "jpg"],
@@ -34,11 +33,17 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, error: "Image is larger than 8MB." }, { status: 400 });
   }
 
-  const dir = path.join(process.cwd(), "public", "uploads");
-  fs.mkdirSync(dir, { recursive: true });
   const name = `${Date.now()}-${randomBytes(4).toString("hex")}.${ext}`;
   const bytes = Buffer.from(await file.arrayBuffer());
-  fs.writeFileSync(path.join(dir, name), bytes);
 
-  return Response.json({ ok: true, url: `/uploads/${name}` });
+  try {
+    const url = await saveUpload(name, bytes, file.type);
+    return Response.json({ ok: true, url });
+  } catch (err) {
+    console.error("[upload] Could not store image:", err);
+    return Response.json(
+      { ok: false, error: "Could not store the image. Please try again." },
+      { status: 500 },
+    );
+  }
 }

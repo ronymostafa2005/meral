@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { defaultContent, safeColor, type FontChoice, type SiteContent } from "../lib/siteContent";
+import { defaultContent, mergeContent, safeColor, type FontChoice, type SiteContent } from "../lib/siteContent";
 
 interface SiteState {
   content: SiteContent;
@@ -45,7 +45,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
       ]);
       if (contentRes.ok) {
         const data = await contentRes.json();
-        applyContent(data);
+        applyContent(mergeContent(data));
       }
       setOwner(sessionRes.ok);
     } catch (e) {
@@ -54,11 +54,16 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // 1. Initial check from localStorage for instant zero-lag load
+    // 1. Initial check from localStorage for instant zero-lag load.
+    // Every value coming from the browser goes through mergeContent: a cache
+    // written by an older deploy can be missing whole sections, and rendering
+    // that raw would crash components that map over them (ToolStage reading
+    // programs.items, for example). Read in an effect, not a lazy useState
+    // initializer, so the first client render still matches the server's.
     try {
       const saved = localStorage.getItem("meral_content_v1");
       if (saved) {
-        setContent(JSON.parse(saved));
+        setContent(mergeContent(JSON.parse(saved)));
       }
     } catch {}
 
@@ -71,7 +76,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
       channel = new BroadcastChannel("meral_content_sync");
       channel.onmessage = (event) => {
         if (event.data?.type === "UPDATE" && event.data?.content) {
-          setContent(event.data.content);
+          setContent(mergeContent(event.data.content));
         }
       };
     } catch {}
@@ -80,7 +85,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     const handleCustomUpdate = (event: Event) => {
       const customEvent = event as CustomEvent<SiteContent>;
       if (customEvent.detail) {
-        setContent(customEvent.detail);
+        setContent(mergeContent(customEvent.detail));
       }
     };
     window.addEventListener("meral_content_update", handleCustomUpdate);
@@ -95,7 +100,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     const handleStorage = (event: StorageEvent) => {
       if (event.key === "meral_content_v1" && event.newValue) {
         try {
-          setContent(JSON.parse(event.newValue));
+          setContent(mergeContent(JSON.parse(event.newValue)));
         } catch {}
       }
     };

@@ -20,6 +20,20 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json().catch(() => null);
-  const saved = await writeContentAsync(mergeContent(body));
-  return Response.json(saved);
+  if (!body) {
+    return Response.json({ ok: false, error: "Invalid content payload." }, { status: 400 });
+  }
+
+  try {
+    const saved = await writeContentAsync(mergeContent(body));
+    return Response.json(saved, { headers: { "Cache-Control": "no-store" } });
+  } catch (err) {
+    // Never answer 200 here: the dashboard would tell the owner their work
+    // was published when nothing was actually stored.
+    console.error("[content] Could not persist content:", err);
+    return Response.json(
+      { ok: false, error: "Could not save your changes. Please try again." },
+      { status: 500 },
+    );
+  }
 }
