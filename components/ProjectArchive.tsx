@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { ChevronLeft, ChevronRight, Layers } from "lucide-react";
 import { sound } from "../utils/audio";
 import { useSite } from "./SiteProvider";
+import { ArchiveLightbox } from "./ArchiveLightbox";
 import type { ArchiveItem } from "../types/portfolio";
 
 /**
@@ -122,7 +123,15 @@ function chunk<T>(list: T[], size: number): T[][] {
   return rows;
 }
 
-function ArchiveCard({ item, index }: { item: ArchiveItem; index: number }) {
+function ArchiveCard({
+  item,
+  index,
+  onOpen,
+}: {
+  item: ArchiveItem;
+  index: number;
+  onOpen: (item: ArchiveItem, frame: number, trigger: HTMLElement) => void;
+}) {
   const [frame, setFrame] = useState(0);
   const [open, setOpen] = useState(false);
   const images = item.images.length ? item.images : ["/work/rise-1.jpg"];
@@ -160,14 +169,14 @@ function ArchiveCard({ item, index }: { item: ArchiveItem; index: number }) {
       }}
       className="archive-card group relative w-full lg:h-full lg:min-w-0 lg:flex-1 lg:basis-0"
     >
-      <div
-        className={`relative aspect-[4/5] w-full overflow-hidden rounded-xl border border-white/10 bg-[#111] lg:aspect-auto lg:h-full ${
-          multiple ? "lg:cursor-pointer" : ""
-        }`}
-      >
+      {/* Every card opens the viewer now, single frame or not, so every card
+          shows a pointer — at every width, not just where hover exists. */}
+      <div className="relative aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#111] lg:aspect-auto lg:h-full">
         <button
           type="button"
-          onClick={() => multiple && step(1)}
+          // Hovering previews the set; clicking hands the piece to the viewer,
+          // which is the only place it can be shown whole and full size.
+          onClick={(event) => onOpen(item, frame, event.currentTarget)}
           onFocus={() => setOpen(true)}
           onBlur={() => {
             setOpen(false);
@@ -175,10 +184,13 @@ function ArchiveCard({ item, index }: { item: ArchiveItem; index: number }) {
           }}
           aria-label={
             multiple
-              ? `${item.title} — frame ${frame + 1} of ${images.length}. Click for the next.`
-              : item.title
+              ? `${item.title} — ${images.length} frames. Open full size.`
+              : `${item.title} — open full size.`
           }
-          className="absolute inset-0 block w-full outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand,#c4a574)]"
+          /* Tailwind v4 gives buttons `cursor: default`, and this one covers
+             the whole card — without the class it overrides the wrapper and
+             the image reads as unclickable. */
+          className="absolute inset-0 block w-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand,#c4a574)]"
         >
           {/* Every frame is mounted and cross-faded. Swapping one src flashes
               white while the next file decodes; only the first loads eagerly.
@@ -272,7 +284,7 @@ function ArchiveCard({ item, index }: { item: ArchiveItem; index: number }) {
                     event.stopPropagation();
                     step(-1);
                   }}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
+                  className="grid h-7 w-7 cursor-pointer place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
                 >
                   <ChevronLeft className="h-3.5 w-3.5" />
                 </button>
@@ -283,7 +295,7 @@ function ArchiveCard({ item, index }: { item: ArchiveItem; index: number }) {
                     event.stopPropagation();
                     step(1);
                   }}
-                  className="grid h-7 w-7 place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
+                  className="grid h-7 w-7 cursor-pointer place-items-center rounded-full border border-white/20 bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/85"
                 >
                   <ChevronRight className="h-3.5 w-3.5" />
                 </button>
@@ -325,6 +337,22 @@ export function ProjectArchive() {
   const archive = content.archive;
   const [page, setPage] = useState(1);
   const [category, setCategory] = useState("All");
+  const [viewing, setViewing] = useState<{ item: ArchiveItem; frame: number } | null>(null);
+  // Where the viewer was opened from, so focus can be handed back on close
+  // rather than dumped at the top of the document.
+  const openerRef = useRef<HTMLElement | null>(null);
+
+  const openViewer = (item: ArchiveItem, frame: number, trigger: HTMLElement) => {
+    sound.playWaterRipple();
+    openerRef.current = trigger;
+    setViewing({ item, frame });
+  };
+
+  const closeViewer = () => {
+    setViewing(null);
+    openerRef.current?.focus();
+    openerRef.current = null;
+  };
 
   const categories = useMemo(
     () => ["All", ...Array.from(new Set(archive.items.map((item) => item.category).filter(Boolean)))],
@@ -402,7 +430,7 @@ export function ProjectArchive() {
               {archive.intro}
             </p>
             <p className="mt-2 hidden font-mono text-[10px] uppercase tracking-[0.16em] text-neutral-600 lg:block">
-              Hover a frame to open it
+              Hover to preview · click to view full size
             </p>
           </div>
         </div>
@@ -443,7 +471,12 @@ export function ProjectArchive() {
               className="archive-row flex flex-col gap-4 lg:h-[32rem] lg:flex-row lg:gap-3 xl:h-[36rem]"
             >
               {row.map((item, i) => (
-                <ArchiveCard key={item.id} item={item} index={rowIndex * ROW_SIZE + i} />
+                <ArchiveCard
+                  key={item.id}
+                  item={item}
+                  index={rowIndex * ROW_SIZE + i}
+                  onOpen={openViewer}
+                />
               ))}
             </div>
           ))}
@@ -512,6 +545,17 @@ export function ProjectArchive() {
           </nav>
         )}
       </div>
+
+      <AnimatePresence>
+        {viewing && (
+          <ArchiveLightbox
+            key={viewing.item.id}
+            item={viewing.item}
+            startFrame={viewing.frame}
+            onClose={closeViewer}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 }
