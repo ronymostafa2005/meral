@@ -106,12 +106,23 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               </p>
             </div>
 
-            {/* Hero Cover Image */}
-            <div className="relative rounded-2xl overflow-hidden aspect-[16/9] border border-white/15 bg-black shadow-2xl">
+            {/* Hero Cover Image.
+                No forced ratio: the work is 4:5, and a 16/9 box with cover was
+                cutting away roughly two thirds of its height — on a key visual
+                that is the headline and the logo. The cover is drawn whole and
+                capped by viewport height, over a blurred enlargement of itself
+                so the frame still fills in the piece's own colours. */}
+            <div className="relative rounded-2xl overflow-hidden border border-white/15 bg-black shadow-2xl">
+              <img
+                src={project.coverImage}
+                alt=""
+                aria-hidden
+                className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-2xl"
+              />
               <img
                 src={project.coverImage}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                className="relative mx-auto block max-h-[72vh] w-auto max-w-full object-contain"
               />
               {project.liveUrl && (
                 <div className="absolute bottom-4 right-4 z-10">
@@ -200,8 +211,22 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <h3 className="font-display text-2xl font-bold text-white">Visual Artifacts &amp; Design System</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {project.galleryImages.map((imgUrl, i) => (
+                    /* Same reasoning as the cover: a 4/3 tile cropped the top
+                       and bottom off upright work. The tile keeps its shape so
+                       the grid stays even, and the piece is drawn whole inside
+                       it over a blurred fill. */
                     <div key={i} className="rounded-2xl overflow-hidden border border-white/10 bg-black aspect-[4/3] group relative">
-                      <img src={imgUrl} alt={`${project.title} asset ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <img
+                        src={imgUrl}
+                        alt=""
+                        aria-hidden
+                        className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-2xl"
+                      />
+                      <img
+                        src={imgUrl}
+                        alt={`${project.title} asset ${i + 1}`}
+                        className="relative h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   ))}
